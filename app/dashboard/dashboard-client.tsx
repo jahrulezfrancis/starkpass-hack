@@ -1,57 +1,59 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import Link from "next/link"
-import { Award, BadgeCheck, ChevronRight, Rocket, Trophy } from "lucide-react"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { Award, BadgeCheck, ChevronRight, Rocket, Trophy } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
-import { Skeleton } from "@/components/ui/skeleton"
-import { useWallet } from "@/lib/wallet-provider"
-import { useUser } from "@/lib/user-provider"
-import { calculateLevelProgress, truncateAddress } from "@/lib/utils"
-import { mockQuests } from "@/lib/mock-data"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useWallet } from "@/lib/wallet-provider";
+import { useUser } from "@/lib/user-provider";
+import { calculateLevelProgress, truncateAddress } from "@/lib/utils";
+import { mockQuests } from "@/lib/mock-data";
+import AuthRedirectDialog from "@/components/auth-redirect-dialogue";
 
 export default function DashboardClient() {
-  const router = useRouter()
-  const { address, isConnected } = useWallet()
-  const { badges, credentials, completedQuests, claimableItems, xp, level, isLoading } = useUser()
-  const [mounted, setMounted] = useState(false)
+  const router = useRouter();
+  const { address, isConnected } = useWallet();
+  const { badges, credentials, completedQuests, claimableItems, xp, level, isLoading } = useUser();
+  const [mounted, setMounted] = useState(false);
 
-  // Use a more reliable approach for handling hydration
   useEffect(() => {
-    setMounted(true)
-    return () => setMounted(false)
-  }, [])
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
-  // Redirect to home if not connected
   useEffect(() => {
     if (mounted && !isConnected && !isLoading) {
-      router.push("/")
+      // Handled by AuthRedirectDialog
     }
-  }, [isConnected, router, mounted, isLoading])
+  }, [isConnected, router, mounted, isLoading]);
 
   if (!mounted) {
-    // Return null during SSR to avoid hydration mismatch
-    return null
+    return null;
   }
 
-  // Add a separate loading state check
-  if (isLoading) {
-    return <DashboardSkeleton />
+  if (!isConnected || isLoading) {
+    return <DashboardSkeleton />;
   }
 
-  // Add this check before the main return
-  if (!isConnected) {
-    return <DashboardSkeleton />
+  if (mounted && !isConnected && !isLoading) {
+    return <AuthRedirectDialog message="You need to connect your wallet to access your dashboard." />;
   }
 
-  // Get in-progress quests (not completed)
-  const inProgressQuests = mockQuests.filter((quest) => !completedQuests.includes(quest.id)).slice(0, 3)
+  const inProgressQuests = mockQuests.filter((quest) => !completedQuests.includes(quest.id)).slice(0, 3);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -90,45 +92,36 @@ export default function DashboardClient() {
       <main className="flex-1 py-6 md:py-10">
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {/* User Stats Card */}
             <Card className="col-span-full md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle>Your Stats</CardTitle>
                 <CardDescription>Your progress in the Starknet ecosystem</CardDescription>
               </CardHeader>
               <CardContent>
-                {isLoading ? (
-                  <div className="space-y-4">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Trophy className="h-5 w-5 text-yellow-500" />
-                        <span className="text-sm font-medium">Level {level}</span>
-                      </div>
-                      <span className="text-sm text-muted-foreground">{xp} XP</span>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Trophy className="h-5 w-5 text-yellow-500" />
+                      <span className="text-sm font-medium">Level {level}</span>
                     </div>
-                    <Progress value={calculateLevelProgress(xp)} className="h-2" />
-                    <div className="grid grid-cols-3 gap-4 pt-2">
-                      <div className="flex flex-col items-center p-2 bg-muted rounded-lg">
-                        <span className="text-2xl font-bold">{badges.length}</span>
-                        <span className="text-xs text-muted-foreground">Badges</span>
-                      </div>
-                      <div className="flex flex-col items-center p-2 bg-muted rounded-lg">
-                        <span className="text-2xl font-bold">{credentials.length}</span>
-                        <span className="text-xs text-muted-foreground">Credentials</span>
-                      </div>
-                      <div className="flex flex-col items-center p-2 bg-muted rounded-lg">
-                        <span className="text-2xl font-bold">{completedQuests.length}</span>
-                        <span className="text-xs text-muted-foreground">Quests</span>
-                      </div>
+                    <span className="text-sm text-muted-foreground">{xp} XP</span>
+                  </div>
+                  <Progress value={calculateLevelProgress(xp)} className="h-2" />
+                  <div className="grid grid-cols-3 gap-4 pt-2">
+                    <div className="flex flex-col items-center p-2 bg-muted rounded-lg">
+                      <span className="text-2xl font-bold">{badges.length}</span>
+                      <span className="text-xs text-muted-foreground">Badges</span>
+                    </div>
+                    <div className="flex flex-col items-center p-2 bg-muted rounded-lg">
+                      <span className="text-2xl font-bold">{credentials.length}</span>
+                      <span className="text-xs text-muted-foreground">Credentials</span>
+                    </div>
+                    <div className="flex flex-col items-center p-2 bg-muted rounded-lg">
+                      <span className="text-2xl font-bold">{completedQuests.length}</span>
+                      <span className="text-xs text-muted-foreground">Quests</span>
                     </div>
                   </div>
-                )}
+                </div>
               </CardContent>
               <CardFooter>
                 <Button variant="outline" className="w-full" asChild>
@@ -140,20 +133,13 @@ export default function DashboardClient() {
               </CardFooter>
             </Card>
 
-            {/* Recent Badges Card */}
             <Card className="col-span-full md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle>Recent Badges</CardTitle>
                 <CardDescription>Your latest achievements</CardDescription>
               </CardHeader>
               <CardContent>
-                {isLoading ? (
-                  <div className="flex gap-4">
-                    <Skeleton className="h-16 w-16 rounded-full" />
-                    <Skeleton className="h-16 w-16 rounded-full" />
-                    <Skeleton className="h-16 w-16 rounded-full" />
-                  </div>
-                ) : badges.length > 0 ? (
+                {badges.length > 0 ? (
                   <div className="flex flex-wrap gap-4">
                     {badges.slice(0, 3).map((badge) => (
                       <div key={badge.id} className="flex flex-col items-center">
@@ -185,19 +171,13 @@ export default function DashboardClient() {
               </CardFooter>
             </Card>
 
-            {/* Claimable Items Card */}
             <Card className="col-span-full md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle>Claimable Items</CardTitle>
                 <CardDescription>Items available for you to claim</CardDescription>
               </CardHeader>
               <CardContent>
-                {isLoading ? (
-                  <div className="space-y-4">
-                    <Skeleton className="h-12 w-full" />
-                    <Skeleton className="h-12 w-full" />
-                  </div>
-                ) : claimableItems.length > 0 ? (
+                {claimableItems.length > 0 ? (
                   <div className="space-y-4">
                     {claimableItems.map((item) => (
                       <div key={item.id} className="flex items-center gap-4">
@@ -244,25 +224,7 @@ export default function DashboardClient() {
               </Button>
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {isLoading ? (
-                Array(3)
-                  .fill(0)
-                  .map((_, i) => (
-                    <Card key={i}>
-                      <CardHeader>
-                        <Skeleton className="h-5 w-3/4 mb-2" />
-                        <Skeleton className="h-4 w-full" />
-                      </CardHeader>
-                      <CardContent>
-                        <Skeleton className="h-4 w-full mb-2" />
-                        <Skeleton className="h-4 w-3/4" />
-                      </CardContent>
-                      <CardFooter>
-                        <Skeleton className="h-10 w-full" />
-                      </CardFooter>
-                    </Card>
-                  ))
-              ) : inProgressQuests.length > 0 ? (
+              {inProgressQuests.length > 0 ? (
                 inProgressQuests.map((quest) => (
                   <Card key={quest.id}>
                     <CardHeader>
@@ -295,8 +257,8 @@ export default function DashboardClient() {
                               quest.difficulty === "Easy"
                                 ? "text-green-500"
                                 : quest.difficulty === "Medium"
-                                  ? "text-yellow-500"
-                                  : "text-red-500"
+                                ? "text-yellow-500"
+                                : "text-red-500"
                             }
                           >
                             {quest.difficulty}
@@ -336,10 +298,9 @@ export default function DashboardClient() {
         </div>
       </main>
     </div>
-  )
+  );
 }
 
-// Skeleton component that matches the structure of the dashboard
 function DashboardSkeleton() {
   return (
     <div className="flex flex-col min-h-screen">
@@ -366,7 +327,6 @@ function DashboardSkeleton() {
       <main className="flex-1 py-6 md:py-10">
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {/* User Stats Card Skeleton */}
             <Card className="col-span-full md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle>Your Stats</CardTitle>
@@ -384,7 +344,6 @@ function DashboardSkeleton() {
               </CardFooter>
             </Card>
 
-            {/* Recent Badges Card Skeleton */}
             <Card className="col-span-full md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle>Recent Badges</CardTitle>
@@ -402,7 +361,6 @@ function DashboardSkeleton() {
               </CardFooter>
             </Card>
 
-            {/* Claimable Items Card Skeleton */}
             <Card className="col-span-full md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle>Claimable Items</CardTitle>
@@ -448,5 +406,5 @@ function DashboardSkeleton() {
         </div>
       </main>
     </div>
-  )
+  );
 }

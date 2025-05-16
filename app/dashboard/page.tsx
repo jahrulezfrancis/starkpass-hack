@@ -4,10 +4,13 @@ import dynamic from "next/dynamic"
 import LoadingDashboard from "./loading"
 
 
-const DashboardClient = dynamic(() => import("./dashboard-client"), {
-  ssr: false,
-  loading: () => <LoadingDashboard />,
-})
+const DashboardClient = dynamic(
+  () => import("./dashboard-client").then((mod) => mod.default),
+  {
+    ssr: false,
+    loading: () => <LoadingDashboard />,
+  }
+)
 
 export default function DashboardPage() {
   return (
