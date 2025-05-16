@@ -1,18 +1,66 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
-import { BarChart, LineChart, PieChart } from "lucide-react"
+import { BarChart, LineChart, PieChart, Download } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useWallet } from "@/lib/wallet-provider"
+import { useContract } from "@/lib/contract-provider"
 import { truncateAddress } from "@/lib/utils"
 import { mockEcosystemStats } from "@/lib/mock-data"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function StatsPage() {
   const { address } = useWallet()
+  const { exportData, isLoading } = useContract()
+  const [showExportDialog, setShowExportDialog] = useState(false)
+  const [exportType, setExportType] = useState("all")
+  const [isExporting, setIsExporting] = useState(false)
+
+  // Handle export data
+  const handleExportData = async () => {
+    try {
+      setIsExporting(true)
+
+      // Get data from contract provider
+      const data = await exportData(exportType)
+
+      // Create a blob and download it
+      const blob = new Blob([data], { type: "application/json" })
+      const url = URL.createObjectURL(blob)
+
+      // Create a temporary link and click it
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `starkpass-${exportType}-data.json`
+      document.body.appendChild(link)
+      link.click()
+
+      // Clean up
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+
+      setShowExportDialog(false)
+    } catch (error) {
+      console.error("Failed to export data:", error)
+    } finally {
+      setIsExporting(false)
+    }
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -31,6 +79,9 @@ export default function StatsPage() {
             </Link>
             <Link href="/stats" className="text-sm font-medium text-primary">
               Stats
+            </Link>
+            <Link href="/dashboard/settings" className="text-sm font-medium">
+              Settings
             </Link>
           </nav>
           <div className="flex items-center gap-4">
@@ -52,8 +103,8 @@ export default function StatsPage() {
               <p className="text-muted-foreground">Overview of the StarkPass ecosystem</p>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline">
-                <LineChart className="mr-2 h-4 w-4" />
+              <Button variant="outline" onClick={() => setShowExportDialog(true)}>
+                <Download className="mr-2 h-4 w-4" />
                 Export Data
               </Button>
             </div>
@@ -234,6 +285,37 @@ export default function StatsPage() {
           </div>
         </div>
       </main>
+
+      {/* Export Data Dialog */}
+      <AlertDialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Export Data</AlertDialogTitle>
+            <AlertDialogDescription>
+              Select the type of data you want to export. The data will be downloaded as a JSON file.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Select value={exportType} onValueChange={setExportType}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select data type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Ecosystem Data</SelectItem>
+                <SelectItem value="users">User Data</SelectItem>
+                <SelectItem value="quests">Quest Data</SelectItem>
+                <SelectItem value="campaigns">Campaign Data</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleExportData} disabled={isExporting || isLoading}>
+              {isExporting ? "Exporting..." : "Export Data"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
