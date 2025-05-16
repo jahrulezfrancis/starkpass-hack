@@ -234,3 +234,22 @@ export const mockEcosystemStats = {
     { id: "campaign-3", title: "Starknet Community Contributor", claimRate: "75%" },
   ],
 }
+
+
+// Export the functions that are being imported elsewhere
+export function getMockBadges(): Badge[] {
+  return mockBadges
+}
+
+export function getMockCredentials(): Credential[] {
+  return mockCredentials
+}
+
+export function getMockStats() {
+  return {
+    users: mockEcosystemStats.totalUsers,
+    quests: mockEcosystemStats.totalQuests,
+    campaigns: mockEcosystemStats.totalCampaigns,
+    badgesIssued: mockEcosystemStats.totalCredentials,
+  }
+}
