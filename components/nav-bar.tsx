@@ -7,13 +7,14 @@ import { Rocket } from "lucide-react";
 
 import { MobileNav } from "./mobile-nav";
 import { ThemeToggle } from "./theme-toggle";
-import WalletConnect from "./wallet-connect";
 import { cn } from "@/lib/utils";
-import { useWalletContext } from "@/context/WalletContext";
+
+import { StarknetWalletConnect } from "./StartknetWalletConnect";
+import { useStarkPass } from "@/context/WalletContext";
 
 export const Nav = () => {
   const pathname = usePathname();
-  const { isConnected } = useWalletContext();
+  const { isConnected } = useStarkPass();
 
   const loggedInLinks = [
     { href: "/", label: "Home" },
@@ -66,7 +67,7 @@ export const Nav = () => {
 
         <div className="flex items-center gap-4">
           <ThemeToggle />
-          <WalletConnect />
+          <StarknetWalletConnect />
         </div>
       </div>
     </header>

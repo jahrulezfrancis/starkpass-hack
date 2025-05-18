@@ -3,12 +3,12 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
 import { ThemeProvider } from "@/components/theme-provider";
-import { WalletProvider } from "@/lib/wallet-provider";
 import { ContractProvider } from "@/lib/contract-provider";
 import { UserProvider } from "@/lib/user-provider";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { Nav } from "@/components/nav-bar";
+import { StarkPassProvider } from "@/context/WalletContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,16 +32,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <WalletProvider>
-            <ContractProvider>
-              <UserProvider>
-                <WalletProvider>
-                  <Nav />
-                  {children}
-                </WalletProvider>
-              </UserProvider>
-            </ContractProvider>
-          </WalletProvider>
+          <ContractProvider>
+            <UserProvider>
+              <StarkPassProvider>
+                <Nav />
+                {children}
+              </StarkPassProvider>
+            </UserProvider>
+          </ContractProvider>
           <Toaster />
         </ThemeProvider>
       </body>

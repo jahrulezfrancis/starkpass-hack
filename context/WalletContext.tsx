@@ -1,40 +1,42 @@
+// context/StarkPassContext.tsx
+
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
-import { useWallet } from "@/lib/wallet-provider";
+import { createContext, useContext, useState, ReactNode } from "react";
 
-interface WalletContextType {
+interface StarkPassContextType {
   isConnected: boolean;
-  address: string | null;
+  setIsConnected: (val: boolean) => void;
+  address: string;
+  setAddress: (val: string) => void;
 }
 
-const WalletContext = createContext<WalletContextType>({
-  isConnected: false,
-  address: null,
-});
+const StarkPassContext = createContext<StarkPassContextType | undefined>(
+  undefined
+);
 
-export const WalletProvider = ({ children }: { children: ReactNode }) => {
-  const { isConnected: libIsConnected, address: libAddress } = useWallet();
-
+export const StarkPassProvider = ({ children }: { children: ReactNode }) => {
   const [isConnected, setIsConnected] = useState(false);
-  const [address, setAddress] = useState<string | null>(null);
-
-  useEffect(() => {
-    setIsConnected(libIsConnected);
-    setAddress(libAddress || null);
-  }, [libIsConnected, libAddress]);
+  const [address, setAddress] = useState("");
 
   return (
-    <WalletContext.Provider value={{ isConnected, address }}>
+    <StarkPassContext.Provider
+      value={{
+        isConnected,
+        setIsConnected,
+        address,
+        setAddress,
+      }}
+    >
       {children}
-    </WalletContext.Provider>
+    </StarkPassContext.Provider>
   );
 };
 
-export const useWalletContext = () => useContext(WalletContext);
+export const useStarkPass = () => {
+  const context = useContext(StarkPassContext);
+  if (!context) {
+    throw new Error("useStarkPass must be used within a StarkPassProvider");
+  }
+  return context;
+};
