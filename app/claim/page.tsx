@@ -9,12 +9,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
-import { useWallet } from "@/lib/wallet-provider"
 import { formatDate } from "@/lib/utils"
 import { mockCampaigns } from "@/lib/mock-data"
+import { useAccount } from "@starknet-react/core"
 
 export default function ClaimPage() {
-  const { address } = useWallet()
+  const { address } = useAccount()
   const [searchQuery, setSearchQuery] = useState("")
 
   // Filter campaigns based on search

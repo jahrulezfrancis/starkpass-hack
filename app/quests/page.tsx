@@ -10,13 +10,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useWallet } from "@/lib/wallet-provider"
 import { useUser } from "@/lib/user-provider"
 import { mockQuests } from "@/lib/mock-data"
 import type { Quest } from "@/types"
+import { useAccount } from "@starknet-react/core"
 
 export default function QuestsPage() {
-  const { address } = useWallet()
+  const { address } = useAccount()
   const { completedQuests } = useUser()
   const [searchQuery, setSearchQuery] = useState("")
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all")
