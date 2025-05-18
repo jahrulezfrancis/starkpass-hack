@@ -1,10 +1,12 @@
 import { Suspense } from "react"
 import ProfileClient from "./profile-client"
 
-export default function ProfilePage({ params }: { params: { address: string } }) {
+export default async function ProfilePage({ params }: { params: { address: string } }) {
+  const { address } = await params
+
   return (
     <Suspense fallback={<div>Loading profile...</div>}>
-      <ProfileClient userAddress={params.address} />
+      <ProfileClient userAddress={address} />
     </Suspense>
   )
 }
