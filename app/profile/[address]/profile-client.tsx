@@ -12,14 +12,14 @@ import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
-import { useWallet } from "@/lib/wallet-provider"
 import { useUser } from "@/lib/user-provider"
 import { calculateLevelProgress, formatDate, truncateAddress } from "@/lib/utils"
 import { mockQuests } from "@/lib/mock-data"
+import { useAccount } from "@starknet-react/core"
 
 export default function ProfileClient({ userAddress }: { userAddress: string }) {
   const { toast } = useToast()
-  const { address: connectedAddress } = useWallet()
+  const { address: connectedAddress } = useAccount()
   const { badges, credentials, completedQuests, xp, level, isLoading } = useUser()
   const [isOwner, setIsOwner] = useState(false)
   const [profileUrl, setProfileUrl] = useState("")

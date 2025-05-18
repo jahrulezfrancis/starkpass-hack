@@ -104,7 +104,7 @@ export function StarknetWalletConnect() {
     }
 
     checkWalletsAndReconnect()
-  }, [account,])
+  }, [])
 
   const handleConnect = async () => {
     if (selectedConnector) {
