@@ -1,6 +1,13 @@
-import { Skeleton } from "@/components/ui/skeleton"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Rocket } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Rocket } from "lucide-react";
 
 export default function LoadingDashboard() {
   return (
@@ -32,7 +39,9 @@ export default function LoadingDashboard() {
             <Card className="col-span-full md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle>Your Stats</CardTitle>
-                <CardDescription>Your progress in the Starknet ecosystem</CardDescription>
+                <CardDescription>
+                  Your progress in the Starknet ecosystem
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -68,7 +77,9 @@ export default function LoadingDashboard() {
             <Card className="col-span-full md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle>Claimable Items</CardTitle>
-                <CardDescription>Items available for you to claim</CardDescription>
+                <CardDescription>
+                  Items available for you to claim
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -110,5 +121,5 @@ export default function LoadingDashboard() {
         </div>
       </main>
     </div>
-  )
+  );
 }

@@ -21,6 +21,7 @@ import {
 import { ThemeToggle } from "@/components/theme-toggle";
 import WalletConnect from "@/components/wallet-connect";
 import { MobileNav } from "@/components/mobile-nav";
+import { MotionAnimation } from "@/motionsHoc/MotionAnimation";
 
 export default function Home() {
   return (
@@ -81,9 +82,11 @@ export default function Home() {
           </div>
         </div>
         <div className="relative max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-6 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
-            Collect On-Chain Credentials & Complete Quests
-          </h1>
+          <MotionAnimation>
+            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-6 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+              Collect On-Chain Credentials & Complete Quests
+            </h1>
+          </MotionAnimation>
           <p className="mt-6 text-lg leading-8 text-muted-foreground max-w-3xl mx-auto">
             StarkPass is a web3 platform for collecting verifiable credentials,
             participating in quests, and showcasing your blockchain journey -

@@ -8,6 +8,7 @@ import { ContractProvider } from "@/lib/contract-provider";
 import { UserProvider } from "@/lib/user-provider";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
+import { Nav } from "@/components/nav-bar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,7 +34,12 @@ export default function RootLayout({
         >
           <WalletProvider>
             <ContractProvider>
-              <UserProvider>{children}</UserProvider>
+              <UserProvider>
+                <WalletProvider>
+                  <Nav />
+                  {children}
+                </WalletProvider>
+              </UserProvider>
             </ContractProvider>
           </WalletProvider>
           <Toaster />

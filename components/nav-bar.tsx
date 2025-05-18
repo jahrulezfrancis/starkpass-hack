@@ -1,16 +1,35 @@
 "use client";
 
 import React from "react";
-import { MobileNav } from "./mobile-nav";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Rocket } from "lucide-react";
+
+import { MobileNav } from "./mobile-nav";
 import { ThemeToggle } from "./theme-toggle";
 import WalletConnect from "./wallet-connect";
-import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { useWalletContext } from "@/context/WalletContext";
 
 export const Nav = () => {
-  const pathName = usePathname();
-  //   console.log("pathname: ", pathName);
+  const pathname = usePathname();
+  const { isConnected } = useWalletContext();
+
+  const loggedInLinks = [
+    { href: "/", label: "Home" },
+    { href: "/about", label: "About" },
+    { href: "/contact", label: "Contact us" },
+  ];
+
+  const guestLinks = [
+    { href: "/dashboard", label: "Dashboard" },
+    { href: "/quests", label: "Quests" },
+    { href: "/claim", label: "Claim" },
+    { href: "/sponsor", label: "Sponsors" },
+    { href: "/stats", label: "Stats" },
+  ];
+
+  const navLinks = isConnected ? loggedInLinks : guestLinks;
 
   return (
     <header className="border-b sticky top-0 z-50 bg-background/80 backdrop-blur-sm">
@@ -27,32 +46,24 @@ export const Nav = () => {
             </span>
           </Link>
         </div>
+
         <nav className="hidden md:flex items-center gap-6">
-          <Link
-            href="/quests"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            Quests
-          </Link>
-          <Link
-            href="/claim"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            Claim
-          </Link>
-          <Link
-            href="/sponsor"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            For Sponsors
-          </Link>
-          <Link
-            href="/stats"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            Stats
-          </Link>
+          {navLinks.map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                "text-sm font-medium transition-colors px-3 py-1 rounded-md",
+                pathname === href
+                  ? "bg-gradient-to-r from-[#ff80b5] to-purple-600 bg-clip-text text-transparent  font-semibold"
+                  : "hover:text-primary"
+              )}
+            >
+              {label}
+            </Link>
+          ))}
         </nav>
+
         <div className="flex items-center gap-4">
           <ThemeToggle />
           <WalletConnect />

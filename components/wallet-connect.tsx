@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Wallet, ChevronDown, ExternalLink } from "lucide-react"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Wallet, ChevronDown, ExternalLink } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,80 +12,87 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { useWallet } from "@/lib/wallet-provider"
-import { truncateAddress } from "@/lib/utils"
-import { useToast } from "@/components/ui/use-toast"
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useWallet } from "@/lib/wallet-provider";
+import { truncateAddress } from "@/lib/utils";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function WalletConnect() {
-  const router = useRouter()
-  const { toast } = useToast()
-  const { address, isConnected, connect, disconnect, networkName } = useWallet()
-  const [isConnecting, setIsConnecting] = useState(false)
-  const [showDialog, setShowDialog] = useState(false)
+  const router = useRouter();
+  const { toast } = useToast();
+  const { address, isConnected, connect, disconnect, networkName } =
+    useWallet();
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
 
   const handleConnect = async () => {
     try {
-      setIsConnecting(true)
-      setShowDialog(true)
+      setIsConnecting(true);
+      setShowDialog(true);
     } catch (error) {
-      console.error("Failed to connect wallet:", error)
+      console.error("Failed to connect wallet:", error);
     } finally {
-      setIsConnecting(false)
+      setIsConnecting(false);
     }
-  }
+  };
 
   const handleWalletSelect = async (walletType: string) => {
     try {
-      await connect({ modalMode: "neverAsk", webWalletUrl: walletType })
-      setShowDialog(false)
+      await connect({ modalMode: "neverAsk", webWalletUrl: walletType });
+      setShowDialog(false);
       toast({
         title: "Wallet Connected",
         description: "Your wallet has been connected successfully.",
-      })
-      router.push("/dashboard")
+      });
+      router.push("/dashboard");
     } catch (error) {
-      console.error(`Failed to connect ${walletType}:`, error)
+      console.error(`Failed to connect ${walletType}:`, error);
       toast({
         title: "Connection Failed",
         description: "Failed to connect wallet. Please try again.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleDisconnect = async () => {
     try {
-      await disconnect()
+      await disconnect();
       toast({
         title: "Wallet Disconnected",
         description: "Your wallet has been disconnected.",
-      })
-      router.push("/")
+      });
+      router.push("/");
     } catch (error) {
-      console.error("Failed to disconnect wallet:", error)
+      console.error("Failed to disconnect wallet:", error);
       toast({
         title: "Disconnection Failed",
         description: "Failed to disconnect wallet. Please try again.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const viewOnExplorer = () => {
-    if (!address) return
+    if (!address) return;
 
     // Determine explorer URL based on network
-    let explorerUrl = "https://starkscan.co/contract/"
+    let explorerUrl = "https://starkscan.co/contract/";
     if (networkName === "Goerli Testnet") {
-      explorerUrl = "https://testnet.starkscan.co/contract/"
+      explorerUrl = "https://testnet.starkscan.co/contract/";
     } else if (networkName === "Sepolia Testnet") {
-      explorerUrl = "https://sepolia.starkscan.co/contract/"
+      explorerUrl = "https://sepolia.starkscan.co/contract/";
     }
 
-    window.open(`${explorerUrl}${address}`, "_blank")
-  }
+    window.open(`${explorerUrl}${address}`, "_blank");
+  };
 
   if (isConnected && address) {
     return (
@@ -101,21 +108,32 @@ export default function WalletConnect() {
           <DropdownMenuLabel>
             <div className="flex flex-col">
               <span>My Account</span>
-              <span className="text-xs text-muted-foreground">{networkName}</span>
+              <span className="text-xs text-muted-foreground">
+                {networkName}
+              </span>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => router.push("/dashboard")}>Dashboard</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push(`/profile/${address}`)}>Profile</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+            Dashboard
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push(`/profile/${address}`)}>
+            Profile
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push(`/dashboard/settings/`)}>
+            Settings
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={viewOnExplorer}>
             <ExternalLink className="h-4 w-4 mr-2" />
             View on Explorer
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleDisconnect}>Disconnect</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleDisconnect}>
+            Disconnect
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    )
+    );
   }
 
   return (
@@ -128,7 +146,9 @@ export default function WalletConnect() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Connect Wallet</DialogTitle>
-            <DialogDescription>Choose a wallet to connect to StarkPass</DialogDescription>
+            <DialogDescription>
+              Choose a wallet to connect to StarkPass
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <Button
@@ -137,7 +157,11 @@ export default function WalletConnect() {
               onClick={() => handleWalletSelect("argentX")}
             >
               <span>Argent X</span>
-              <img src="/placeholder.svg?height=24&width=24" alt="Argent X" className="h-6 w-6" />
+              <img
+                src="/placeholder.svg?height=24&width=24"
+                alt="Argent X"
+                className="h-6 w-6"
+              />
             </Button>
             <Button
               variant="outline"
@@ -145,7 +169,11 @@ export default function WalletConnect() {
               onClick={() => handleWalletSelect("braavos")}
             >
               <span>Braavos</span>
-              <img src="/placeholder.svg?height=24&width=24" alt="Braavos" className="h-6 w-6" />
+              <img
+                src="/placeholder.svg?height=24&width=24"
+                alt="Braavos"
+                className="h-6 w-6"
+              />
             </Button>
             <Button
               variant="outline"
@@ -159,5 +187,5 @@ export default function WalletConnect() {
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }
