@@ -1,13 +1,16 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-
 import { ThemeProvider } from "@/components/theme-provider"
-import { WalletProvider } from "@/lib/wallet-provider"
 import { ContractProvider } from "@/lib/contract-provider"
 import { UserProvider } from "@/lib/user-provider"
 import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
+import { CustomWalletProvider } from "@/components/WalletProvider"
+import { WalletProvider } from "@/lib/wallet-provider"
+import { WagmiProvider } from "wagmi"
+import { rainbow_custom_config } from "@/lib/walletconfig"
+import { StarknetWalletProvider } from "@/components/Providers/StartknetWalletProvider"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -38,6 +41,7 @@ function ThemeScript() {
   )
 }
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -49,19 +53,26 @@ export default function RootLayout({
         <ThemeScript />
       </head>
       <body className={inter.className}>
-        <ThemeProvider 
+        <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
           storageKey="theme"
         >
-          <WalletProvider>
-            <ContractProvider>
-              <UserProvider>{children}</UserProvider>
-            </ContractProvider>
-          </WalletProvider>
-          <Toaster />
+          <WagmiProvider config={rainbow_custom_config}>
+            <StarknetWalletProvider >
+
+          <CustomWalletProvider>
+            <WalletProvider>
+              <ContractProvider>
+                <UserProvider>{children}</UserProvider>
+              </ContractProvider>
+            </WalletProvider>
+            <Toaster />
+          </CustomWalletProvider>
+            </StarknetWalletProvider>
+          </WagmiProvider>
         </ThemeProvider>
       </body>
     </html>

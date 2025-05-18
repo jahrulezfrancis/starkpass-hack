@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowRight, BadgeCheck, Globe, Rocket, Shield, Sparkles, Trophy, Users } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
-import WalletConnect from "@/components/wallet-connect"
 import { MobileNav } from "@/components/mobile-nav"
+import { StarknetWalletConnect } from "@/components/StartknetWalletConnect"
 
 export default function Home() {
   return (
@@ -37,7 +37,7 @@ export default function Home() {
           </nav>
           <div className="flex items-center gap-4">
             <ThemeToggle />
-            <WalletConnect />
+            <StarknetWalletConnect />
           </div>
         </div>
       </header>
