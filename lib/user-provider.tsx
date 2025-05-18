@@ -67,8 +67,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
           const claimable = [
             {
               id: "claimable-cred-1",
-              name: "Starknet Hackathon 2023",
-              description: "Participated in the Starknet Hackathon 2023",
+              name: "Starknet Hackathon 2025",
+              description: "Participated in the Starknet Hackathon 2025",
               image: "/placeholder.svg?height=300&width=300",
               issuer: "Starknet Foundation",
               issuedAt: new Date().toISOString(),

@@ -148,7 +148,7 @@ export default function CreateCampaignPage() {
                     <Input
                       id="title"
                       name="title"
-                      placeholder="e.g., Starknet Hackathon 2023 POAP"
+                      placeholder="e.g., Starknet Hackathon 2025 POAP"
                       value={formData.title}
                       onChange={handleInputChange}
                       required
