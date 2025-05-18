@@ -78,7 +78,7 @@ export default function ProfileClient({ userAddress }: { userAddress: string }) 
     if (!userAddress) return
 
     // For this example, we'll use Starkscan testnet
-    const explorerUrl = "https://testnet.starkscan.co/contract/"
+    const explorerUrl = "https://starkscan.co/contract/"
     window.open(`${explorerUrl}${userAddress}`, "_blank")
   }
 
