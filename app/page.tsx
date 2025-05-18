@@ -1,10 +1,26 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowRight, BadgeCheck, Globe, Rocket, Shield, Sparkles, Trophy, Users } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
-import WalletConnect from "@/components/wallet-connect"
-import { MobileNav } from "@/components/mobile-nav"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ArrowRight,
+  BadgeCheck,
+  Globe,
+  Rocket,
+  Shield,
+  Sparkles,
+  Trophy,
+  Users,
+} from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import WalletConnect from "@/components/wallet-connect";
+import { MobileNav } from "@/components/mobile-nav";
 
 export default function Home() {
   return (
@@ -14,7 +30,10 @@ export default function Home() {
         <div className="container flex items-center justify-between h-16 px-4 md:px-6">
           <div className="flex items-center">
             <MobileNav />
-            <Link href="/" className="flex items-center gap-2 text-lg font-semibold ml-2 md:ml-0">
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-lg font-semibold ml-2 md:ml-0"
+            >
               <Rocket className="h-6 w-6 text-primary" />
               <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent font-bold">
                 StarkPass
@@ -22,16 +41,28 @@ export default function Home() {
             </Link>
           </div>
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="/quests" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link
+              href="/quests"
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
               Quests
             </Link>
-            <Link href="/claim" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link
+              href="/claim"
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
               Claim
             </Link>
-            <Link href="/sponsor" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link
+              href="/sponsor"
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
               For Sponsors
             </Link>
-            <Link href="/stats" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link
+              href="/stats"
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
               Stats
             </Link>
           </nav>
@@ -54,8 +85,9 @@ export default function Home() {
             Collect On-Chain Credentials & Complete Quests
           </h1>
           <p className="mt-6 text-lg leading-8 text-muted-foreground max-w-3xl mx-auto">
-            StarkPass is a web3 platform for collecting verifiable credentials, participating in quests, and showcasing
-            your blockchain journey - all powered by StarkNet.
+            StarkPass is a web3 platform for collecting verifiable credentials,
+            participating in quests, and showcasing your blockchain journey -
+            all powered by StarkNet.
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <Link href="/quests">
@@ -63,7 +95,10 @@ export default function Home() {
                 Explore Quests
               </Button>
             </Link>
-            <Link href="/sponsor" className="text-sm font-semibold leading-6 flex items-center gap-1">
+            <Link
+              href="/sponsor"
+              className="text-sm font-semibold leading-6 flex items-center gap-1"
+            >
               Become a Sponsor <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -83,7 +118,9 @@ export default function Home() {
               <p className="text-3xl font-bold">12,500+</p>
             </div>
             <div className="bg-background rounded-lg p-6 shadow-sm border border-border">
-              <p className="text-sm text-muted-foreground">Credentials Issued</p>
+              <p className="text-sm text-muted-foreground">
+                Credentials Issued
+              </p>
               <p className="text-3xl font-bold">8,200+</p>
             </div>
             <div className="bg-background rounded-lg p-6 shadow-sm border border-border">
@@ -102,8 +139,8 @@ export default function Home() {
               Everything You Need for Web3 Credentials
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              StarkPass provides a complete platform for creating, earning, and managing on-chain credentials and
-              quests.
+              StarkPass provides a complete platform for creating, earning, and
+              managing on-chain credentials and quests.
             </p>
           </div>
 
@@ -113,13 +150,14 @@ export default function Home() {
                 <Trophy className="h-10 w-10 text-primary mb-2" />
                 <CardTitle>Complete Quests</CardTitle>
                 <CardDescription>
-                  Participate in educational quests and challenges to earn on-chain credentials.
+                  Participate in educational quests and challenges to earn
+                  on-chain credentials.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  From beginner tutorials to advanced challenges, our quests help you learn while earning verifiable
-                  credentials.
+                  From beginner tutorials to advanced challenges, our quests
+                  help you learn while earning verifiable credentials.
                 </p>
               </CardContent>
               <CardFooter>
@@ -136,12 +174,14 @@ export default function Home() {
                 <BadgeCheck className="h-10 w-10 text-primary mb-2" />
                 <CardTitle>Earn Credentials</CardTitle>
                 <CardDescription>
-                  Collect verifiable on-chain credentials that prove your skills and achievements.
+                  Collect verifiable on-chain credentials that prove your skills
+                  and achievements.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  All credentials are stored on StarkNet as NFTs, making them truly yours and verifiable by anyone.
+                  All credentials are stored on StarkNet as NFTs, making them
+                  truly yours and verifiable by anyone.
                 </p>
               </CardContent>
               <CardFooter>
@@ -158,12 +198,14 @@ export default function Home() {
                 <Globe className="h-10 w-10 text-primary mb-2" />
                 <CardTitle>Showcase Profile</CardTitle>
                 <CardDescription>
-                  Display your achievements and credentials with a personalized on-chain profile.
+                  Display your achievements and credentials with a personalized
+                  on-chain profile.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Your StarkPass profile serves as your web3 resume, showcasing your journey and accomplishments.
+                  Your StarkPass profile serves as your web3 resume, showcasing
+                  your journey and accomplishments.
                 </p>
               </CardContent>
               <CardFooter>
@@ -180,12 +222,14 @@ export default function Home() {
                 <Sparkles className="h-10 w-10 text-primary mb-2" />
                 <CardTitle>Create Campaigns</CardTitle>
                 <CardDescription>
-                  Sponsors can create custom credential campaigns and educational quests.
+                  Sponsors can create custom credential campaigns and
+                  educational quests.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Design your own credential programs to engage users, educate your community, and reward participation.
+                  Design your own credential programs to engage users, educate
+                  your community, and reward participation.
                 </p>
               </CardContent>
               <CardFooter>
@@ -202,12 +246,14 @@ export default function Home() {
                 <Shield className="h-10 w-10 text-primary mb-2" />
                 <CardTitle>StarkNet Powered</CardTitle>
                 <CardDescription>
-                  Built on StarkNet for security, scalability, and low transaction costs.
+                  Built on StarkNet for security, scalability, and low
+                  transaction costs.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  StarkNet's Layer 2 technology ensures your credentials are secure and affordable to mint and transfer.
+                  StarkNet's Layer 2 technology ensures your credentials are
+                  secure and affordable to mint and transfer.
                 </p>
               </CardContent>
               <CardFooter>
@@ -223,12 +269,14 @@ export default function Home() {
               <CardHeader>
                 <Users className="h-10 w-10 text-primary mb-2" />
                 <CardTitle>Community Driven</CardTitle>
-                <CardDescription>Join a community of learners, builders, and web3 enthusiasts.</CardDescription>
+                <CardDescription>
+                  Join a community of learners, builders, and web3 enthusiasts.
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Connect with others, share your achievements, and collaborate on projects within our growing
-                  community.
+                  Connect with others, share your achievements, and collaborate
+                  on projects within our growing community.
                 </p>
               </CardContent>
               <CardFooter>
@@ -246,13 +294,20 @@ export default function Home() {
       {/* CTA Section */}
       <section className="bg-primary text-primary-foreground py-16 px-4 sm:px-6 lg:px-8 mt-8">
         <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">Ready to Start Your Web3 Journey?</h2>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
+            Ready to Start Your Web3 Journey?
+          </h2>
           <p className="text-lg max-w-3xl mx-auto mb-8 opacity-90">
-            Join thousands of users collecting credentials, completing quests, and building their on-chain reputation.
+            Join thousands of users collecting credentials, completing quests,
+            and building their on-chain reputation.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/quests">
-              <Button size="lg" variant="secondary" className="rounded-full px-8">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="rounded-full px-8"
+              >
                 Explore Quests
               </Button>
             </Link>
@@ -276,13 +331,22 @@ export default function Home() {
             &copy; {new Date().getFullYear()} StarkPass. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
-            <Link href="/stats" className="text-sm text-gray-500 hover:underline">
+            <Link
+              href="/stats"
+              className="text-sm text-gray-500 hover:underline"
+            >
               Stats
             </Link>
-            <Link href="/sponsor" className="text-sm text-gray-500 hover:underline">
+            <Link
+              href="/sponsor"
+              className="text-sm text-gray-500 hover:underline"
+            >
               For Sponsors
             </Link>
-            <Link href="/dashboard/settings" className="text-sm text-gray-500 hover:underline">
+            <Link
+              href="/dashboard/settings"
+              className="text-sm text-gray-500 hover:underline"
+            >
               Settings
             </Link>
             <ThemeToggle />
@@ -290,5 +354,5 @@ export default function Home() {
         </div>
       </footer>
     </div>
-  )
+  );
 }
