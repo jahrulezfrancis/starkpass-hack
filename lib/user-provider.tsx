@@ -1,10 +1,10 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import { useWallet } from "./wallet-provider"
 import { useContract } from "./contract-provider"
 import type { Badge, Credential } from "@/types"
 import { mockCompletedQuests } from "@/lib/mock-data"
+import { useAccount } from "@starknet-react/core"
 
 interface UserContextType {
   badges: Badge[]
@@ -21,7 +21,7 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const { address, isConnected } = useWallet()
+  const { address, isConnected } = useAccount()
   const { getUserBadges, getUserCredentials, mintBadge, mintCredential } = useContract()
   const [badges, setBadges] = useState<Badge[]>([])
   const [credentials, setCredentials] = useState<Credential[]>([])
