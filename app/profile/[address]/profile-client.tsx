@@ -51,34 +51,50 @@ export default function ProfileClient({ userAddress }: { userAddress: string }) 
   }
 
   // Handle share profile
-  const handleShareProfile = () => {
-    const shareText = `Check out my StarkPass profile with ${badges.length} badges and ${credentials.length} credentials!`
+  // Update your handleShareProfile function with proper error handling
+const handleShareProfile = async () => {
+  const shareText = `Check out my StarkPass profile with ${badges.length} badges and ${credentials.length} credentials!`
 
+  try {
     // Try to use Web Share API if available
     if (navigator.share) {
-      navigator
-        .share({
-          title: "My StarkPass Profile",
-          text: shareText,
-          url: profileUrl,
-        })
-        .catch((error) => console.error("Error sharing:", error))
+      await navigator.share({
+        title: "My StarkPass Profile",
+        text: shareText,
+        url: profileUrl,
+      })
+      // Share was successful
+      toast({
+        title: "Shared Successfully",
+        description: "Your profile has been shared.",
+      })
     } else {
       // Fallback to clipboard
-      navigator.clipboard.writeText(`${shareText} ${profileUrl}`)
+      await navigator.clipboard.writeText(`${shareText} ${profileUrl}`)
       toast({
         title: "Share Info Copied",
         description: "Share text and link have been copied to clipboard.",
       })
     }
+  } catch (error) {
+    // Only show error toast if it's NOT an abort error (user canceled)
+    if (typeof error === "object" && error !== null && "name" in error && (error as { name: string }).name !== 'AbortError') {
+      toast({
+        title: "Share Failed",
+        description: "Could not share the profile. Please try again.",
+        variant: "destructive",
+      })
+    }
+    console.error("Share error:", error)
   }
+}
 
   // View on explorer
   const viewOnExplorer = () => {
     if (!userAddress) return
 
     // For this example, we'll use Starkscan testnet
-    const explorerUrl = "https://testnet.starkscan.co/contract/"
+    const explorerUrl = "https://starkscan.co/contract/"
     window.open(`${explorerUrl}${userAddress}`, "_blank")
   }
 
@@ -181,7 +197,7 @@ export default function ProfileClient({ userAddress }: { userAddress: string }) 
                       <Separator />
                       <div className="space-y-2">
                         <p className="text-sm font-medium">Member Since</p>
-                        <p className="text-sm text-muted-foreground">January 15, 2023</p>
+                        <p className="text-sm text-muted-foreground">January 15, 2025</p>
                       </div>
                       <Separator />
                       <div className="flex flex-col gap-2">

@@ -433,12 +433,12 @@ export function ContractProvider({ children }: { children: ReactNode }) {
               totalUsers: 1250,
               activeUsers: { daily: 120, weekly: 450, monthly: 850 },
               userGrowth: [
-                { date: "2023-01", users: 250 },
-                { date: "2023-02", users: 450 },
-                { date: "2023-03", users: 650 },
-                { date: "2023-04", users: 850 },
-                { date: "2023-05", users: 1050 },
-                { date: "2023-06", users: 1250 },
+                { date: "2025-01", users: 250 },
+                { date: "2025-02", users: 450 },
+                { date: "2025-03", users: 650 },
+                { date: "2025-04", users: 850 },
+                { date: "2025-05", users: 1050 },
+                { date: "2025-06", users: 1250 },
               ],
               topUsers: [
                 { address: "0x1234...5678", completedQuests: 12, credentials: 8 },
@@ -465,7 +465,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
               totalClaims: 3500,
               averageClaimRate: "70%",
               campaigns: [
-                { id: "campaign-1", title: "Starknet Hackathon 2023 POAP", claims: 450, claimRate: "90%" },
+                { id: "campaign-1", title: "Starknet Hackathon 2025 POAP", claims: 450, claimRate: "90%" },
                 { id: "campaign-2", title: "Cairo Workshop Certificate", claims: 180, claimRate: "60%" },
                 { id: "campaign-3", title: "Starknet Community Contributor", claims: 75, claimRate: "75%" },
               ],
