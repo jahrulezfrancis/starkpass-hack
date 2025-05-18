@@ -130,8 +130,8 @@ export function StarknetWalletConnect() {
       }
     };
 
-    checkWalletsAndReconnect();
-  }, [account]);
+    checkWalletsAndReconnect()
+  }, [])
 
   const handleConnect = async () => {
     if (selectedConnector) {

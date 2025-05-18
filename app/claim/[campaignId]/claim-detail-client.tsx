@@ -5,25 +5,24 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowLeft, BadgeCheck, Calendar, Check, Rocket, Share2 } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
-import { useWallet } from "@/lib/wallet-provider"
 import { useUser } from "@/lib/user-provider"
 import { useContract } from "@/lib/contract-provider"
 import { formatDate } from "@/lib/utils"
 import { mockCampaigns } from "@/lib/mock-data"
+import { StarknetWalletConnect } from "@/components/StartknetWalletConnect"
+import { useAccount } from "@starknet-react/core"
 
 export default function ClaimDetailClient({ campaignId }: { campaignId: string }) {
   const router = useRouter()
   const { toast } = useToast()
-  const { address, isConnected, connect } = useWallet()
+  const { address, isConnected } = useAccount()
   const { claimCredential } = useUser()
   const { isEligibleForClaim } = useContract()
-  const [isConnecting, setIsConnecting] = useState(false)
   const [isClaiming, setIsClaiming] = useState(false)
   const [claimed, setClaimed] = useState(false)
   const [isEligible, setIsEligible] = useState(false)
@@ -80,25 +79,7 @@ export default function ClaimDetailClient({ campaignId }: { campaignId: string }
   }
 
   // Handle connect wallet
-  const handleConnect = async () => {
-    try {
-      setIsConnecting(true)
-      await connect()
-      toast({
-        title: "Wallet Connected",
-        description: "Your wallet has been connected successfully.",
-      })
-    } catch (error) {
-      console.error("Failed to connect wallet:", error)
-      toast({
-        title: "Connection Failed",
-        description: "Failed to connect wallet. Please try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsConnecting(false)
-    }
-  }
+
 
   // Handle claim
   const handleClaim = async () => {
@@ -281,15 +262,7 @@ export default function ClaimDetailClient({ campaignId }: { campaignId: string }
                             Connect your Starknet wallet to verify eligibility
                           </p>
                           {!isConnected && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="mt-2"
-                              onClick={handleConnect}
-                              disabled={isConnecting}
-                            >
-                              {isConnecting ? "Connecting..." : "Connect Wallet"}
-                            </Button>
+                            <StarknetWalletConnect />
                           )}
                         </div>
                         {isConnected && <Check className="h-5 w-5 text-green-500 ml-auto" />}

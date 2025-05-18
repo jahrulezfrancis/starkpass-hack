@@ -1,7 +1,7 @@
-"use client";
+'use client'
 
 import { createContext, useContext, useEffect, useMemo, useState, useRef, type ReactNode } from "react";
-import { useWallet } from "./wallet-provider";
+import { useAccount, useNetwork } from '@starknet-react/core';
 import { useToast } from "@/components/ui/use-toast";
 import type { Badge, Credential } from "@/types";
 import {
@@ -12,45 +12,7 @@ import {
   getMockCredentials,
 } from "@/lib/mock-contract";
 import { getNetworkUrl, StarknetChainIds } from "@/contants/starknet";
-import { SignerInterface, TypedData, Call } from "starknet";
-
-// Custom signer to adapt wallet.account to Starknet's SignerInterface
-class CustomWalletSigner implements SignerInterface {
-  private walletAccount: any;
-
-  constructor(walletAccount: any) {
-    this.walletAccount = walletAccount;
-  }
-
-  async getPubKey(): Promise<string> {
-    return this.walletAccount.address;
-  }
-
-  async signMessage(typedData: TypedData, accountAddress: string): Promise<string[]> {
-    try {
-      const result = await this.walletAccount.signMessage({
-        message: JSON.stringify(typedData),
-        domain: typedData.domain,
-      });
-      return Array.isArray(result) ? result : [result];
-    } catch (error) {
-      throw new Error(`Failed to sign message: ${error}`);
-    }
-  }
-
-  async signTransaction(transactions: Call[], transactionsDetail: any, abis?: any[]): Promise<string[]> {
-    // Placeholder; implement based on wallet's transaction signing method
-    throw new Error("Transaction signing not implemented");
-  }
-
-  async signDeployAccountTransaction(transaction: any): Promise<string[]> {
-    throw new Error("Deploy account transaction signing not implemented");
-  }
-
-  async signDeclareTransaction(transaction: any): Promise<string[]> {
-    throw new Error("Declare transaction signing not implemented");
-  }
-}
+import { Contract, RpcProvider } from "starknet";
 
 // ABI for ERC721 contract
 const ERC721_ABI = [
@@ -95,9 +57,15 @@ const CONTRACT_ADDRESSES = {
 };
 
 // Interfaces
+interface MockContract {
+  balanceOf: (address: string) => Promise<{ balance: string }>;
+  mint: (to: string, tokenId: string, uri: string) => Promise<{ transaction_hash: string }>;
+  waitForTransaction?: (transactionHash: string) => Promise<void>;
+}
+
 interface ContractWrapper {
-  read: any;
-  write: any;
+  read: Contract | MockContract;
+  write: Contract | MockContract;
 }
 
 interface MockProvider {
@@ -105,13 +73,8 @@ interface MockProvider {
   callContract: (call: any) => Promise<{ result: string[] }>;
 }
 
-interface MockContract {
-  balanceOf: (address: string) => Promise<{ balance: string }>;
-  mint: (to: string, tokenId: string, uri: string) => Promise<{ transaction_hash: string }>;
-}
-
 interface ContractContextType {
-  provider: any | null;
+  provider: RpcProvider | MockProvider | null;
   badgeContract: ContractWrapper | null;
   credentialContract: ContractWrapper | null;
   getUserBadges: (address: string) => Promise<Badge[]>;
@@ -130,9 +93,10 @@ interface ContractContextType {
 const ContractContext = createContext<ContractContextType | undefined>(undefined);
 
 export function ContractProvider({ children }: { children: ReactNode }) {
-  const { wallet, isConnected, chainId } = useWallet();
+  const { account, status, address } = useAccount();
+  const { chain } = useNetwork();
   const { toast } = useToast();
-  const [provider, setProvider] = useState<any | null>(null);
+  const [provider, setProvider] = useState<RpcProvider | MockProvider | null>(null);
   const [badgeContract, setBadgeContract] = useState<ContractWrapper | null>(null);
   const [credentialContract, setCredentialContract] = useState<ContractWrapper | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -149,9 +113,9 @@ export function ContractProvider({ children }: { children: ReactNode }) {
   const resetError = () => setError(null);
 
   useEffect(() => {
-    console.log("ContractProvider useEffect triggered", { isConnected, wallet, chainId });
+    console.log("ContractProvider useEffect triggered", { status, address, chainId: chain?.id });
     const initializeContracts = async () => {
-      if (!isConnected || !wallet || !wallet.account?.address) {
+      if (status !== "connected" || !account || !address) {
         setProvider(null);
         setBadgeContract(null);
         setCredentialContract(null);
@@ -159,37 +123,40 @@ export function ContractProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        if (process.env.NODE_ENV === "development" || wallet.id === "mock") {
-          if (process.env.NODE_ENV !== "development") {
-            console.warn("Mock wallet detected in non-development environment");
-          }
+        if (process.env.NODE_ENV === "development") {
           console.log("Using mock provider for development");
           const mockProvider = createMockProvider();
           const mockBadgeContract = createMockBadgeContract();
           const mockCredentialContract = createMockCredentialContract();
 
+          // Add waitForTransaction for mock compatibility
+          const enhancedMockBadgeContract: MockContract = {
+            ...mockBadgeContract,
+            waitForTransaction: async () => {}, // Mock empty wait
+          };
+          const enhancedMockCredentialContract: MockContract = {
+            ...mockCredentialContract,
+            waitForTransaction: async () => {}, // Mock empty wait
+          };
+
           setProvider(mockProvider);
-          setBadgeContract({ read: mockBadgeContract, write: mockBadgeContract });
-          setCredentialContract({ read: mockCredentialContract, write: mockCredentialContract });
+          setBadgeContract({ read: enhancedMockBadgeContract, write: enhancedMockBadgeContract });
+          setCredentialContract({ read: enhancedMockCredentialContract, write: enhancedMockCredentialContract });
           return;
         }
 
-        const starknet = await import("starknet");
-        const nodeUrl = chainId ? getNetworkUrl(chainId) : getNetworkUrl(StarknetChainIds.SN_MAIN);
-        const rpcProvider = new starknet.RpcProvider({ nodeUrl });
+        const nodeUrl = chain?.id ? getNetworkUrl(chain.id.toString()) : getNetworkUrl(StarknetChainIds.SN_MAIN);
+        const rpcProvider = new RpcProvider({ nodeUrl });
         setProvider(rpcProvider);
 
-        const signer = new CustomWalletSigner(wallet.account);
-        const signerAccount = new starknet.Account(rpcProvider, wallet.account.address, signer);
-
         setBadgeContract({
-          read: new starknet.Contract(ERC721_ABI, CONTRACT_ADDRESSES.BADGE_CONTRACT, rpcProvider),
-          write: new starknet.Contract(ERC721_ABI, CONTRACT_ADDRESSES.BADGE_CONTRACT, signerAccount),
+          read: new Contract(ERC721_ABI, CONTRACT_ADDRESSES.BADGE_CONTRACT, rpcProvider),
+          write: new Contract(ERC721_ABI, CONTRACT_ADDRESSES.BADGE_CONTRACT, account),
         });
 
         setCredentialContract({
-          read: new starknet.Contract(ERC721_ABI, CONTRACT_ADDRESSES.CREDENTIAL_CONTRACT, rpcProvider),
-          write: new starknet.Contract(ERC721_ABI, CONTRACT_ADDRESSES.CREDENTIAL_CONTRACT, signerAccount),
+          read: new Contract(ERC721_ABI, CONTRACT_ADDRESSES.CREDENTIAL_CONTRACT, rpcProvider),
+          write: new Contract(ERC721_ABI, CONTRACT_ADDRESSES.CREDENTIAL_CONTRACT, account),
         });
       } catch (error) {
         console.error("Failed to initialize contracts:", error);
@@ -212,6 +179,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
             mint: async (to, tokenId, uri) => ({
               transaction_hash: "0x" + Math.random().toString(16).slice(2),
             }),
+            waitForTransaction: async () => {},
           };
           setBadgeContract({ read: mockBadgeContract, write: mockBadgeContract });
 
@@ -220,6 +188,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
             mint: async (to, tokenId, uri) => ({
               transaction_hash: "0x" + Math.random().toString(16).slice(2),
             }),
+            waitForTransaction: async () => {},
           };
           setCredentialContract({ read: mockCredentialContract, write: mockCredentialContract });
         }
@@ -227,7 +196,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     };
 
     initializeContracts();
-  }, [isConnected, wallet, chainId, toast]);
+  }, [status, account, address, chain?.id, toast]);
 
   const getUserBadges = async (address: string): Promise<Badge[]> => {
     if (badgeCache.current.has(address)) {
@@ -237,7 +206,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
-      if (process.env.NODE_ENV === "development" || wallet?.id === "mock") {
+      if (process.env.NODE_ENV === "development") {
         await new Promise((resolve) => setTimeout(resolve, 500));
         const badges = getMockBadges();
         badgeCache.current.set(address, badges);
@@ -282,7 +251,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
-      if (process.env.NODE_ENV === "development" || wallet?.id === "mock") {
+      if (process.env.NODE_ENV === "development") {
         await new Promise((resolve) => setTimeout(resolve, 500));
         const credentials = getMockCredentials();
         credentialCache.current.set(address, credentials);
@@ -326,7 +295,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
-      if (process.env.NODE_ENV === "development" || wallet?.id === "mock") {
+      if (process.env.NODE_ENV === "development") {
         await new Promise((resolve) => setTimeout(resolve, 1500));
         const result = {
           transactionHash: "0x" + Math.random().toString(16).slice(2),
@@ -340,15 +309,12 @@ export function ContractProvider({ children }: { children: ReactNode }) {
         throw new Error("Badge contract not initialized");
       }
 
-      const starknet = await import("starknet");
-      const tokenId = starknet.shortString.encodeShortString(`${questId}-${Date.now()}`);
-      const { transaction_hash } = await badgeContract.write.mint(
-        to,
-        tokenId,
-        starknet.shortString.encodeShortString(uri)
-      );
+      const tokenId = `0x${(questId + "-" + Date.now()).padStart(64, "0")}`;
+      const { transaction_hash } = await badgeContract.write.mint(to, tokenId, uri);
 
-      await badgeContract.write.waitForTransaction(transaction_hash);
+      if (badgeContract.write.waitForTransaction) {
+        await badgeContract.write.waitForTransaction(transaction_hash);
+      }
       badgeCache.current.delete(to); // Invalidate cache
       return { transactionHash: transaction_hash, tokenId };
     } catch (error) {
@@ -365,7 +331,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
-      if (process.env.NODE_ENV === "development" || wallet?.id === "mock") {
+      if (process.env.NODE_ENV === "development") {
         await new Promise((resolve) => setTimeout(resolve, 1500));
         const result = {
           transactionHash: "0x" + Math.random().toString(16).slice(2),
@@ -379,15 +345,12 @@ export function ContractProvider({ children }: { children: ReactNode }) {
         throw new Error("Credential contract not initialized");
       }
 
-      const starknet = await import("starknet");
-      const tokenId = starknet.shortString.encodeShortString(`${campaignId}-${Date.now()}`);
-      const { transaction_hash } = await credentialContract.write.mint(
-        to,
-        tokenId,
-        starknet.shortString.encodeShortString(uri)
-      );
+      const tokenId = `0x${(campaignId + "-" + Date.now()).padStart(64, "0")}`;
+      const { transaction_hash } = await credentialContract.write.mint(to, tokenId, uri);
 
-      await credentialContract.write.waitForTransaction(transaction_hash);
+      if (credentialContract.write.waitForTransaction) {
+        await credentialContract.write.waitForTransaction(transaction_hash);
+      }
       credentialCache.current.delete(to); // Invalidate cache
       return { transactionHash: transaction_hash, tokenId };
     } catch (error) {
@@ -404,7 +367,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
-      if (process.env.NODE_ENV === "development" || wallet?.id === "mock") {
+      if (process.env.NODE_ENV === "development") {
         await new Promise((resolve) => setTimeout(resolve, 800));
         return true;
       }
@@ -424,7 +387,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
-      if (process.env.NODE_ENV === "development" || wallet?.id === "mock") {
+      if (process.env.NODE_ENV === "development") {
         await new Promise((resolve) => setTimeout(resolve, 800));
         let exportData = {};
         switch (dataType) {
@@ -494,7 +457,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
-      if (process.env.NODE_ENV === "development" || wallet?.id === "mock") {
+      if (process.env.NODE_ENV === "development") {
         await new Promise((resolve) => setTimeout(resolve, 1500));
         return {
           transactionHash: "0x" + Math.random().toString(16).slice(2),
@@ -517,7 +480,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
-      if (process.env.NODE_ENV === "development" || wallet?.id === "mock") {
+      if (process.env.NODE_ENV === "development") {
         await new Promise((resolve) => setTimeout(resolve, 1500));
         return {
           transactionHash: "0x" + Math.random().toString(16).slice(2),
@@ -556,14 +519,6 @@ export function ContractProvider({ children }: { children: ReactNode }) {
       provider,
       badgeContract,
       credentialContract,
-      getUserBadges,
-      getUserCredentials,
-      mintBadge,
-      mintCredential,
-      isEligibleForClaim,
-      exportData,
-      createCampaign,
-      createQuest,
       isLoading,
       error,
     ]
