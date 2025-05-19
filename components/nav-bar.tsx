@@ -41,7 +41,7 @@ export const Nav = () => {
             className="flex items-center gap-2 text-lg font-semibold ml-2 md:ml-0"
           >
             <Rocket className="h-6 w-6 text-primary" />
-            <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent font-bold">
+            <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent font-bold hidden md:block">
               StarkPass
             </span>
           </Link>

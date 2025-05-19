@@ -1,13 +1,19 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Menu } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { useState } from "react";
+import Link from "next/link";
+import { Menu, Rocket } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 export function MobileNav() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -25,8 +31,15 @@ export function MobileNav() {
           </SheetDescription>
         </VisuallyHidden>
         <div className="flex flex-col gap-6 px-2 py-6">
-          <Link href="/" className="flex items-center gap-2 text-lg font-semibold" onClick={() => setOpen(false)}>
-            <span>StarkPass</span>
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-lg font-semibold"
+            onClick={() => setOpen(false)}
+          >
+            <Rocket className="h-6 w-6 text-primary" />
+            <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent font-bold ">
+              StarkPass
+            </span>
           </Link>
           <nav className="flex flex-col gap-4">
             <Link
@@ -75,5 +88,5 @@ export function MobileNav() {
         </div>
       </SheetContent>
     </Sheet>
-  )
+  );
 }
