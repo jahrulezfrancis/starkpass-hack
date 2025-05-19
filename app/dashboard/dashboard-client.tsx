@@ -27,7 +27,15 @@ import { useUser } from "@/lib/user-provider";
 export default function DashboardClient() {
   const router = useRouter();
   const { address, isConnected } = useAccount();
-  const { badges, credentials, completedQuests, claimableItems, xp, level, isLoading } = useUser();
+  const {
+    badges,
+    credentials,
+    completedQuests,
+    claimableItems,
+    xp,
+    level,
+    isLoading,
+  } = useUser();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -50,52 +58,26 @@ export default function DashboardClient() {
   }
 
   if (mounted && !isConnected && !isLoading) {
-    return <AuthRedirectDialog message="You need to connect your wallet to access your dashboard." />;
+    return (
+      <AuthRedirectDialog message="You need to connect your wallet to access your dashboard." />
+    );
   }
 
-  const inProgressQuests = mockQuests.filter((quest) => !completedQuests.includes(quest.id)).slice(0, 3);
+  const inProgressQuests = mockQuests
+    .filter((quest) => !completedQuests.includes(quest.id))
+    .slice(0, 3);
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="border-b">
-        <div className="container flex items-center justify-between h-16 px-4 md:px-6">
-          <Link href="/" className="flex items-center gap-2 text-lg font-semibold">
-            <Rocket className="h-6 w-6" />
-            <span>StarkPass</span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/dashboard" className="text-sm font-medium text-primary">
-              Dashboard
-            </Link>
-            <Link href="/quests" className="text-sm font-medium">
-              Quests
-            </Link>
-            <Link href={`/profile/${address}`} className="text-sm font-medium">
-              Profile
-            </Link>
-            <Link href="/claim" className="text-sm font-medium">
-              Claim
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link href={`/profile/${address}`} className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
-                {address ? address.charAt(2).toUpperCase() : "?"}
-              </div>
-              <span className="hidden md:inline-block text-sm font-medium">
-                {address ? truncateAddress(address) : ""}
-              </span>
-            </Link>
-          </div>
-        </div>
-      </header>
       <main className="flex-1 py-6 md:py-10">
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Card className="col-span-full md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle>Your Stats</CardTitle>
-                <CardDescription>Your progress in the Starknet ecosystem</CardDescription>
+                <CardDescription>
+                  Your progress in the Starknet ecosystem
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -104,21 +86,38 @@ export default function DashboardClient() {
                       <Trophy className="h-5 w-5 text-yellow-500" />
                       <span className="text-sm font-medium">Level {level}</span>
                     </div>
-                    <span className="text-sm text-muted-foreground">{xp} XP</span>
+                    <span className="text-sm text-muted-foreground">
+                      {xp} XP
+                    </span>
                   </div>
-                  <Progress value={calculateLevelProgress(xp)} className="h-2" />
+                  <Progress
+                    value={calculateLevelProgress(xp)}
+                    className="h-2"
+                  />
                   <div className="grid grid-cols-3 gap-4 pt-2">
                     <div className="flex flex-col items-center p-2 bg-muted rounded-lg">
-                      <span className="text-2xl font-bold">{badges.length}</span>
-                      <span className="text-xs text-muted-foreground">Badges</span>
+                      <span className="text-2xl font-bold">
+                        {badges.length}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        Badges
+                      </span>
                     </div>
                     <div className="flex flex-col items-center p-2 bg-muted rounded-lg">
-                      <span className="text-2xl font-bold">{credentials.length}</span>
-                      <span className="text-xs text-muted-foreground">Credentials</span>
+                      <span className="text-2xl font-bold">
+                        {credentials.length}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        Credentials
+                      </span>
                     </div>
                     <div className="flex flex-col items-center p-2 bg-muted rounded-lg">
-                      <span className="text-2xl font-bold">{completedQuests.length}</span>
-                      <span className="text-xs text-muted-foreground">Quests</span>
+                      <span className="text-2xl font-bold">
+                        {completedQuests.length}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        Quests
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -142,7 +141,10 @@ export default function DashboardClient() {
                 {badges.length > 0 ? (
                   <div className="flex flex-wrap gap-4">
                     {badges.slice(0, 3).map((badge) => (
-                      <div key={badge.id} className="flex flex-col items-center">
+                      <div
+                        key={badge.id}
+                        className="flex flex-col items-center"
+                      >
                         <div className="relative w-16 h-16 mb-2">
                           <Image
                             src={badge.image || "/placeholder.svg"}
@@ -151,7 +153,9 @@ export default function DashboardClient() {
                             className="rounded-full object-cover"
                           />
                         </div>
-                        <span className="text-xs text-center font-medium">{badge.name}</span>
+                        <span className="text-xs text-center font-medium">
+                          {badge.name}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -174,7 +178,9 @@ export default function DashboardClient() {
             <Card className="col-span-full md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle>Claimable Items</CardTitle>
-                <CardDescription>Items available for you to claim</CardDescription>
+                <CardDescription>
+                  Items available for you to claim
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {claimableItems.length > 0 ? (
@@ -190,8 +196,12 @@ export default function DashboardClient() {
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{item.name}</p>
-                          <p className="text-xs text-muted-foreground truncate">From: {item.issuer}</p>
+                          <p className="text-sm font-medium truncate">
+                            {item.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            From: {item.issuer}
+                          </p>
                         </div>
                         <Button size="sm" asChild>
                           <Link href={`/claim/${item.id}`}>Claim</Link>
@@ -238,7 +248,9 @@ export default function DashboardClient() {
                               className="rounded-full object-cover"
                             />
                           </div>
-                          <span className="text-sm text-muted-foreground">{quest.sponsor}</span>
+                          <span className="text-sm text-muted-foreground">
+                            {quest.sponsor}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1 text-sm font-medium text-yellow-500">
                           <Trophy className="h-4 w-4" />
@@ -251,7 +263,9 @@ export default function DashboardClient() {
                     <CardContent>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Difficulty:</span>
+                          <span className="text-muted-foreground">
+                            Difficulty:
+                          </span>
                           <span
                             className={
                               quest.difficulty === "Easy"
@@ -265,13 +279,17 @@ export default function DashboardClient() {
                           </span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Estimated Time:</span>
+                          <span className="text-muted-foreground">
+                            Estimated Time:
+                          </span>
                           <span>{quest.estimatedTime}</span>
                         </div>
                         <Separator className="my-2" />
                         <div className="flex items-center gap-2">
                           <BadgeCheck className="h-5 w-5 text-primary" />
-                          <span className="text-sm font-medium">Badge Reward: {quest.badgeReward.name}</span>
+                          <span className="text-sm font-medium">
+                            Badge Reward: {quest.badgeReward.name}
+                          </span>
                         </div>
                       </div>
                     </CardContent>
@@ -286,7 +304,9 @@ export default function DashboardClient() {
                 <div className="col-span-full flex items-center justify-center h-40 bg-muted rounded-lg">
                   <div className="text-center">
                     <Award className="h-10 w-10 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-muted-foreground">No quests in progress</p>
+                    <p className="text-muted-foreground">
+                      No quests in progress
+                    </p>
                     <Button variant="outline" className="mt-4" asChild>
                       <Link href="/quests">Browse Quests</Link>
                     </Button>
@@ -330,7 +350,9 @@ function DashboardSkeleton() {
             <Card className="col-span-full md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle>Your Stats</CardTitle>
-                <CardDescription>Your progress in the Starknet ecosystem</CardDescription>
+                <CardDescription>
+                  Your progress in the Starknet ecosystem
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -364,7 +386,9 @@ function DashboardSkeleton() {
             <Card className="col-span-full md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle>Claimable Items</CardTitle>
-                <CardDescription>Items available for you to claim</CardDescription>
+                <CardDescription>
+                  Items available for you to claim
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">

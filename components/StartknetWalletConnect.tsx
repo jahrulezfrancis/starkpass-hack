@@ -1,61 +1,79 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { useAccount, useConnect, useDisconnect } from '@starknet-react/core'
-import { argent, braavos, InjectedConnector } from '@starknet-react/core'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu'
-import { Button } from './ui/button'
-import { ChevronDown, ExternalLink, Wallet, Info } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import React, { useState, useEffect } from "react";
+import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
+import { argent, braavos, InjectedConnector } from "@starknet-react/core";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
+import { ChevronDown, ExternalLink, Wallet, Info } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useStarkPass } from "@/context/WalletContext";
 
 interface ConnectorItem {
-  id: string
-  name: string
-  connector: InjectedConnector
-  icon: string
+  id: string;
+  name: string;
+  connector: InjectedConnector;
+  icon: string;
 }
 
 function truncateAddress(address: string) {
-  const start = 6
-  const end = 4
-  if (address.length <= start + end) return address
-  return `${address.slice(0, start)}...${address.slice(-end)}`
+  const start = 6;
+  const end = 4;
+  if (address.length <= start + end) return address;
+  return `${address.slice(0, start)}...${address.slice(-end)}`;
 }
 
 export function StarknetWalletConnect() {
-  const { account, status, address } = useAccount()
-  const { connect } = useConnect()
-  const { disconnect } = useDisconnect()
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false)
-  const [selectedConnector, setSelectedConnector] = useState<ConnectorItem | null>(null)
-  const [availableConnectors, setAvailableConnectors] = useState<ConnectorItem[]>([])
-  const router = useRouter()
+  const { account, status, address } = useAccount();
+  const { connect } = useConnect();
+  const { disconnect } = useDisconnect();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
+  const [selectedConnector, setSelectedConnector] =
+    useState<ConnectorItem | null>(null);
+  const [availableConnectors, setAvailableConnectors] = useState<
+    ConnectorItem[]
+  >([]);
+  const router = useRouter();
+
+  //For the useContext provider
+  const { setAddress, setIsConnected } = useStarkPass();
 
   // Define connectors with icons
   const supportedConnectors: ConnectorItem[] = [
     {
-      id: 'argent',
-      name: 'Argent X',
+      id: "argent",
+      name: "Argent X",
       connector: argent(),
-      icon: 'https://i.ibb.co/nNFpnZbK/argent.png?text=A'
+      icon: "https://i.ibb.co/nNFpnZbK/argent.png?text=A",
     },
     {
-      id: 'braavos',
-      name: 'Braavos',
+      id: "braavos",
+      name: "Braavos",
       connector: braavos(),
-      icon: 'https://i.ibb.co/spM38rcQ/bravos.png?text=B'
+      icon: "https://i.ibb.co/spM38rcQ/bravos.png?text=B",
     },
-  ]
+  ];
 
   // Log connection status
   useEffect(() => {
     if (status === "disconnected") {
-      console.log("Disconnected from the wallet")
-    } else if (status === "connected") {
-      console.log("We connected to the wallet", address)
+      console.log("Disconnected from the wallet");
+      setIsConnected(false);
+      setAddress("");
+    } else if (status === "connected" && address) {
+      console.log("We connected to the wallet", address);
+      setIsConnected(true);
+      setAddress(address);
     }
-  }, [address, status])
+  }, [address, status]);
 
   // Check available connectors and persist connection
   useEffect(() => {
@@ -63,45 +81,54 @@ export function StarknetWalletConnect() {
       const detectedConnectors = await Promise.all(
         supportedConnectors.map(async (item) => {
           try {
-            const isAvailable = await item.connector.available()
-            return isAvailable ? item : null
+            const isAvailable = await item.connector.available();
+            return isAvailable ? item : null;
           } catch {
-            return null
+            return null;
           }
         })
-      )
-      const validConnectors = detectedConnectors.filter((item): item is ConnectorItem => item !== null)
-      setAvailableConnectors(validConnectors)
+      );
+      const validConnectors = detectedConnectors.filter(
+        (item): item is ConnectorItem => item !== null
+      );
+      setAvailableConnectors(validConnectors);
 
       if (account) {
         // If account connected but no selectedConnector set, try to set it
         if (!selectedConnector) {
-          const savedConnectorId = localStorage.getItem('starknetConnectorId')
+          const savedConnectorId = localStorage.getItem("starknetConnectorId");
           if (savedConnectorId) {
-            const savedConnector = supportedConnectors.find((c) => c.id === savedConnectorId)
+            const savedConnector = supportedConnectors.find(
+              (c) => c.id === savedConnectorId
+            );
             if (savedConnector) {
-              setSelectedConnector(savedConnector)
+              setSelectedConnector(savedConnector);
             }
           }
         }
-        return // Already connected, no need to reconnect
+        return; // Already connected, no need to reconnect
       }
 
       // Attempt to reconnect to a previously connected wallet if no account yet
-      const savedConnectorId = localStorage.getItem('starknetConnectorId')
+      const savedConnectorId = localStorage.getItem("starknetConnectorId");
       if (savedConnectorId) {
-        const savedConnector = supportedConnectors.find((c) => c.id === savedConnectorId)
-        if (savedConnector && validConnectors.some((c) => c.id === savedConnectorId)) {
+        const savedConnector = supportedConnectors.find(
+          (c) => c.id === savedConnectorId
+        );
+        if (
+          savedConnector &&
+          validConnectors.some((c) => c.id === savedConnectorId)
+        ) {
           try {
-            await connect({ connector: savedConnector.connector })
-            setSelectedConnector(savedConnector)
+            await connect({ connector: savedConnector.connector });
+            setSelectedConnector(savedConnector);
           } catch (error) {
-            console.error('Failed to reconnect:', error)
-            localStorage.removeItem('starknetConnectorId')
+            console.error("Failed to reconnect:", error);
+            localStorage.removeItem("starknetConnectorId");
           }
         }
       }
-    }
+    };
 
     checkWalletsAndReconnect()
   }, [])
@@ -109,30 +136,30 @@ export function StarknetWalletConnect() {
   const handleConnect = async () => {
     if (selectedConnector) {
       try {
-        await connect({ connector: selectedConnector.connector })
-        localStorage.setItem('starknetConnectorId', selectedConnector.id)
-        setIsModalOpen(false)
+        await connect({ connector: selectedConnector.connector });
+        localStorage.setItem("starknetConnectorId", selectedConnector.id);
+        setIsModalOpen(false);
       } catch (error) {
-        console.error('Connection failed:', error)
-        alert('Failed to connect wallet. Please try again.')
+        console.error("Connection failed:", error);
+        alert("Failed to connect wallet. Please try again.");
       }
     }
-  }
+  };
 
   const viewOnExplorer = () => {
-    if (!account?.address) return
-    const explorerUrl = 'https://starkscan.co/contract/'
-    window.open(`${explorerUrl}${account.address}`, '_blank')
-  }
+    if (!account?.address) return;
+    const explorerUrl = "https://starkscan.co/contract/";
+    window.open(`${explorerUrl}${account.address}`, "_blank");
+  };
 
   const handleDisconnect = () => {
-    disconnect()
-    setSelectedConnector(null)
-    localStorage.removeItem('starknetConnectorId')
-  }
+    disconnect();
+    setSelectedConnector(null);
+    localStorage.removeItem("starknetConnectorId");
+  };
 
   if (account) {
-    const connectedWallet = selectedConnector?.name || 'Unknown Wallet'
+    const connectedWallet = selectedConnector?.name || "Unknown Wallet";
 
     return (
       <DropdownMenu>
@@ -147,21 +174,36 @@ export function StarknetWalletConnect() {
           <DropdownMenuLabel>
             <div className="flex flex-col">
               <span>My Account</span>
-              <span className="text-xs text-muted-foreground">{connectedWallet}</span>
+              <span className="text-xs text-muted-foreground">
+                {connectedWallet}
+              </span>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => router.push('/dashboard')}>Dashboard</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push(`/profile/${account.address}`)}>Profile</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+            Dashboard
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => router.push(`/profile/${account.address}`)}
+          >
+            Profile
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => router.push(`/dashboard/profile/${account.address}`)}
+          >
+            Settings
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={viewOnExplorer}>
             <ExternalLink className="h-4 w-4 mr-2" />
             View on Explorer
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleDisconnect}>Disconnect</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleDisconnect}>
+            Disconnect
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    )
+    );
   }
 
   if (availableConnectors.length === 0) {
@@ -185,7 +227,9 @@ export function StarknetWalletConnect() {
           <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 h-screen w-screen">
             <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-white">Install a StarkNet Wallet</h2>
+                <h2 className="text-xl font-bold text-white">
+                  Install a StarkNet Wallet
+                </h2>
                 <button
                   onClick={() => setIsInstallModalOpen(false)}
                   className="text-white hover:text-gray-300"
@@ -193,7 +237,9 @@ export function StarknetWalletConnect() {
                   ×
                 </button>
               </div>
-              <p className="text-gray-400 mb-6">Please install a supported StarkNet wallet to continue:</p>
+              <p className="text-gray-400 mb-6">
+                Please install a supported StarkNet wallet to continue:
+              </p>
               <ul className="list-disc pl-5 mb-6 space-y-2 text-white">
                 <li>
                   <a
@@ -203,7 +249,7 @@ export function StarknetWalletConnect() {
                     className="text-blue-400 hover:underline"
                   >
                     Install Argent X
-                  </a>{' '}
+                  </a>{" "}
                   - A secure wallet for StarkNet.
                 </li>
                 <li>
@@ -214,12 +260,13 @@ export function StarknetWalletConnect() {
                     className="text-blue-400 hover:underline"
                   >
                     Install Braavos
-                  </a>{' '}
+                  </a>{" "}
                   - Another great StarkNet wallet.
                 </li>
               </ul>
               <p className="text-gray-400">
-                After installing, create an account and refresh this page to connect.
+                After installing, create an account and refresh this page to
+                connect.
               </p>
               <div className="flex justify-end mt-6">
                 <button
@@ -233,7 +280,7 @@ export function StarknetWalletConnect() {
           </div>
         )}
       </div>
-    )
+    );
   }
 
   return (
@@ -259,7 +306,9 @@ export function StarknetWalletConnect() {
                 ×
               </button>
             </div>
-            <p className="text-gray-400 mb-6">Choose a wallet to connect to StarkPass</p>
+            <p className="text-gray-400 mb-6">
+              Choose a wallet to connect to StarkPass
+            </p>
             <div className="space-y-3">
               {availableConnectors.map((item) => (
                 <label
@@ -274,7 +323,11 @@ export function StarknetWalletConnect() {
                     onChange={() => setSelectedConnector(item)}
                     className="mr-3 w-4 h-4 text-blue-600 focus:ring-0"
                   />
-                  <img src={item.icon} alt={`${item.name} icon`} className="w-6 h-6 mr-3 rounded-full" />
+                  <img
+                    src={item.icon}
+                    alt={`${item.name} icon`}
+                    className="w-6 h-6 mr-3 rounded-full"
+                  />
                   <span className="text-white">{item.name}</span>
                 </label>
               ))}
@@ -285,8 +338,8 @@ export function StarknetWalletConnect() {
                 disabled={!selectedConnector}
                 className={`px-4 py-2 rounded-lg transition ${
                   selectedConnector
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'bg-gray-500 text-gray-300 cursor-not-allowed'
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    : "bg-gray-500 text-gray-300 cursor-not-allowed"
                 }`}
               >
                 Connect
@@ -296,5 +349,5 @@ export function StarknetWalletConnect() {
         </div>
       )}
     </div>
-  )
+  );
 }
