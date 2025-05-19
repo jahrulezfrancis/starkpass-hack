@@ -1,80 +1,53 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import { ThemeProvider } from "@/components/theme-provider"
-import { ContractProvider } from "@/lib/contract-provider"
-import { UserProvider } from "@/lib/user-provider"
-import { Toaster } from "@/components/ui/toaster"
-import "./globals.css"
-import { CustomWalletProvider } from "@/components/WalletProvider"
-import { WalletProvider } from "@/lib/wallet-provider"
-import { WagmiProvider } from "wagmi"
-import { rainbow_custom_config } from "@/lib/walletconfig"
-import { StarknetWalletProvider } from "@/components/Providers/StartknetWalletProvider"
+import type React from "react";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"] })
+import { ThemeProvider } from "@/components/theme-provider";
+import { ContractProvider } from "@/lib/contract-provider";
+import { UserProvider } from "@/lib/user-provider";
+import { Toaster } from "@/components/ui/toaster";
+import "./globals.css";
+import { Nav } from "@/components/nav-bar";
+import { StarkPassProvider } from "@/context/WalletContext";
+import { CustomWalletProvider } from "@/components/WalletProvider";
+import { StarknetWalletProvider } from "@/components/Providers/StartknetWalletProvider";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "StarkPass - Web3 Credentials & Quest Platform",
-  description: "Collect on-chain credentials, participate in quests, and showcase your web3 journey with StarkPass.",
-}
-
-// This component will help prevent theme flickering
-function ThemeScript() {
-  return (
-    <script
-      dangerouslySetInnerHTML={{
-        __html: `
-          (function() {
-            try {
-              var theme = localStorage.getItem('theme') || 
-                         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-              var systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-              
-              document.documentElement.classList.add(theme === 'system' ? systemTheme : theme);
-              document.documentElement.style.colorScheme = theme === 'system' ? systemTheme : theme;
-            } catch (e) {}
-          })();
-        `,
-      }}
-    />
-  )
-}
-
+  description:
+    "Collect on-chain credentials, participate in quests, and showcase your web3 journey with StarkPass.",
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <ThemeScript />
-      </head>
-      <body className={inter.className}>
+    <html lang="en">
+      <body className={inter.className} suppressHydrationWarning={true}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
-          storageKey="theme"
         >
-          <WagmiProvider config={rainbow_custom_config}>
-            <StarknetWalletProvider >
+          <StarknetWalletProvider>
+            <ContractProvider>
+              <UserProvider>
+                <StarkPassProvider>
+                  <Nav />
+                  {children}
+                </StarkPassProvider>
+              </UserProvider>
+            </ContractProvider>
+          </StarknetWalletProvider>
 
-          <CustomWalletProvider>
-            <WalletProvider>
-              <ContractProvider>
-                <UserProvider>{children}</UserProvider>
-              </ContractProvider>
-            </WalletProvider>
-            <Toaster />
-          </CustomWalletProvider>
-            </StarknetWalletProvider>
-          </WagmiProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
