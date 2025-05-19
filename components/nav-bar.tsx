@@ -18,8 +18,7 @@ export const Nav = () => {
 
   const loggedInLinks = [
     { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
-    { href: "/contact", label: "Contact us" },
+    { href: "/sponsor", label: "Sponsors" },
   ];
 
   const guestLinks = [
@@ -30,7 +29,7 @@ export const Nav = () => {
     { href: "/stats", label: "Stats" },
   ];
 
-  const navLinks = isConnected ? loggedInLinks : guestLinks;
+  const navLinks = !isConnected ? loggedInLinks : guestLinks;
 
   return (
     <header className="border-b sticky top-0 z-50 bg-background/80 backdrop-blur-sm">

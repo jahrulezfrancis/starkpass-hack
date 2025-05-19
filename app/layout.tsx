@@ -9,6 +9,8 @@ import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { Nav } from "@/components/nav-bar";
 import { StarkPassProvider } from "@/context/WalletContext";
+import { CustomWalletProvider } from "@/components/WalletProvider";
+import { StarknetWalletProvider } from "@/components/Providers/StartknetWalletProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,14 +34,17 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ContractProvider>
-            <UserProvider>
-              <StarkPassProvider>
-                <Nav />
-                {children}
-              </StarkPassProvider>
-            </UserProvider>
-          </ContractProvider>
+          <StarknetWalletProvider>
+            <ContractProvider>
+              <UserProvider>
+                <StarkPassProvider>
+                  <Nav />
+                  {children}
+                </StarkPassProvider>
+              </UserProvider>
+            </ContractProvider>
+          </StarknetWalletProvider>
+
           <Toaster />
         </ThemeProvider>
       </body>
