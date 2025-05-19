@@ -3,36 +3,20 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  BadgeCheck,
-  Copy,
-  ExternalLink,
-  Rocket,
-  Share2,
-  Trophy,
-} from "lucide-react";
+import { BadgeCheck, Copy, ExternalLink, Share2, Trophy, } from "lucide-react";
 import Head from "next/head";
-
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { useUser } from "@/lib/user-provider";
-import {
-  calculateLevelProgress,
-  formatDate,
-  truncateAddress,
-} from "@/lib/utils";
-import { mockQuests } from "@/lib/mock-data";
+import { calculateLevelProgress, formatDate, truncateAddress, } from "@/lib/utils";
 import { useAccount } from "@starknet-react/core";
+import { getUserCompletedQuests } from "@/hooks/quest/useFetchQuest";
+import { Quest } from "@/types";
+import { useUserProgress } from "@/hooks/useUserProgress";
 
 export default function ProfileClient({
   userAddress,
@@ -41,10 +25,10 @@ export default function ProfileClient({
 }) {
   const { toast } = useToast();
   const { address: connectedAddress } = useAccount();
-  const { badges, credentials, completedQuests, xp, level, isLoading } =
-    useUser();
+  const { xp, level, } = useUser();
   const [isOwner, setIsOwner] = useState(false);
   const [profileUrl, setProfileUrl] = useState("");
+  const {completedCampaigns, completedQuests, badges} = useUserProgress(connectedAddress)
 
   // Set profile URL for sharing
   useEffect(() => {
@@ -60,10 +44,6 @@ export default function ProfileClient({
     }
   }, [connectedAddress, userAddress]);
 
-  // Get completed quest details
-  const completedQuestDetails = mockQuests.filter((quest) =>
-    completedQuests.includes(quest.id)
-  );
 
   // Handle copy profile link
   const handleCopyProfileLink = () => {
@@ -77,7 +57,7 @@ export default function ProfileClient({
   // Handle share profile
   // Update your handleShareProfile function with proper error handling
   const handleShareProfile = async () => {
-    const shareText = `Check out my StarkPass profile with ${badges.length} badges and ${credentials.length} credentials!`;
+    const shareText = `Check out my StarkPass profile with ${badges.length} badges and ${completedCampaigns.length + completedQuests.length} credentials!`;
 
     try {
       // Try to use Web Share API if available
@@ -138,7 +118,7 @@ export default function ProfileClient({
         </title>
         <meta
           name="description"
-          content={`StarkPass profile with ${badges.length} badges and ${credentials.length} credentials`}
+          content={`StarkPass profile with ${badges.length} badges and ${completedCampaigns.length} credentials`}
         />
         <meta
           property="og:title"
@@ -146,7 +126,7 @@ export default function ProfileClient({
         />
         <meta
           property="og:description"
-          content={`Check out this StarkPass profile with ${badges.length} badges and ${credentials.length} credentials!`}
+          content={`Check out this StarkPass profile with ${badges.length} badges and ${completedCampaigns.length} credentials!`}
         />
         <meta
           property="og:image"
@@ -218,7 +198,7 @@ export default function ProfileClient({
                         </div>
                         <div>
                           <p className="text-2xl font-bold">
-                            {credentials.length}
+                            {completedQuests.length + badges.length}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             Credentials
@@ -284,36 +264,36 @@ export default function ProfileClient({
                   {/* Credentials Tab */}
                   <TabsContent value="credentials" className="mt-6">
                     <h2 className="text-xl font-semibold mb-4">Credentials</h2>
-                    {credentials.length > 0 ? (
+                    {completedCampaigns.length > 0 ? (
                       <div className="grid gap-4 md:grid-cols-2">
-                        {credentials.map((credential) => (
+                        {completedCampaigns.map((credential) => (
                           <Card key={credential.id}>
                             <CardContent className="p-4">
                               <div className="flex gap-4">
                                 <div className="relative w-16 h-16 flex-shrink-0">
                                   <Image
-                                    src={credential.image || "/placeholder.svg"}
-                                    alt={credential.name}
+                                    src={credential.credentialImage || "/placeholder.svg"}
+                                    alt={credential.title}
                                     fill
                                     className="rounded-md object-cover"
                                   />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <h3 className="font-semibold truncate">
-                                    {credential.name}
+                                    {credential.title}
                                   </h3>
                                   <p className="text-sm text-muted-foreground truncate">
                                     {credential.description}
                                   </p>
                                   <div className="flex items-center gap-2 mt-1">
                                     <span className="text-xs text-muted-foreground">
-                                      Issued by {credential.issuer}
+                                      Issued by {credential.sponsor}
                                     </span>
                                     <span className="text-xs text-muted-foreground">
                                       •
                                     </span>
                                     <span className="text-xs text-muted-foreground">
-                                      {formatDate(credential.issuedAt)}
+                                      {formatDate(credential.endDate)}
                                     </span>
                                   </div>
                                   <div className="flex items-center gap-2 mt-2">
@@ -414,9 +394,9 @@ export default function ProfileClient({
                     <h2 className="text-xl font-semibold mb-4">
                       Completed Quests
                     </h2>
-                    {completedQuestDetails.length > 0 ? (
+                    {completedQuests.length > 0 ? (
                       <div className="space-y-4">
-                        {completedQuestDetails.map((quest) => (
+                        {completedQuests.map((quest) => (
                           <Card key={quest.id}>
                             <CardContent className="p-4">
                               <div className="flex items-center gap-4">
@@ -438,7 +418,7 @@ export default function ProfileClient({
                                   </div>
                                 </div>
                                 <Button variant="outline" size="sm" asChild>
-                                  <Link href={`/quests/${quest.id}`}>View</Link>
+                                  <Link href={`/quests/${quest}`}>View</Link>
                                 </Button>
                               </div>
                             </CardContent>
