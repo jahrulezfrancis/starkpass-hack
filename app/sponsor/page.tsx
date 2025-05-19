@@ -1,28 +1,30 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { BarChart3, Plus, Rocket, Settings } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { BarChart3, Plus, Rocket, Settings } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useAccount } from "@starknet-react/core"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAccount } from "@starknet-react/core";
 
-import { mockCampaigns, mockQuests } from "@/lib/mock-data"
+import { mockCampaigns, mockQuests } from "@/lib/mock-data";
 
 export default function SponsorDashboard() {
-  const { address } = useAccount()
-  const [activeTab, setActiveTab] = useState("campaigns")
+  const { address } = useAccount();
+  const [activeTab, setActiveTab] = useState("campaigns");
 
   // Mock campaign analytics
   const campaignAnalytics = mockCampaigns.map((campaign) => ({
     ...campaign,
     claimRate: Math.round((campaign.totalClaims / campaign.maxClaims) * 100),
     uniqueVisitors: Math.round(campaign.totalClaims * 2.5),
-    conversionRate: Math.round((campaign.totalClaims / (campaign.totalClaims * 2.5)) * 100),
-  }))
+    conversionRate: Math.round(
+      (campaign.totalClaims / (campaign.totalClaims * 2.5)) * 100
+    ),
+  }));
 
   // Mock quest analytics
   const questAnalytics = mockQuests.map((quest) => ({
@@ -30,42 +32,18 @@ export default function SponsorDashboard() {
     participants: Math.floor(Math.random() * 500) + 100,
     completionRate: Math.floor(Math.random() * 60) + 20,
     averageTimeToComplete: `${Math.floor(Math.random() * 30) + 10} min`,
-  }))
+  }));
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="border-b">
-        <div className="container flex items-center justify-between h-16 px-4 md:px-6">
-          <Link href="/" className="flex items-center gap-2 text-lg font-semibold">
-            <Rocket className="h-6 w-6" />
-            <span>StarkPass</span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/dashboard" className="text-sm font-medium">
-              Dashboard
-            </Link>
-            <Link href="/sponsor" className="text-sm font-medium text-primary">
-              Sponsor
-            </Link>
-            <Link href="/stats" className="text-sm font-medium">
-              Stats
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link href={`/profile/${address}`} className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
-                {address ? address.charAt(2).toUpperCase() : "?"}
-              </div>
-            </Link>
-          </div>
-        </div>
-      </header>
       <main className="flex-1 py-6 md:py-10">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
             <div>
               <h1 className="text-3xl font-bold mb-2">Sponsor Dashboard</h1>
-              <p className="text-muted-foreground">Manage your quests and claim campaigns</p>
+              <p className="text-muted-foreground">
+                Manage your quests and claim campaigns
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <Button asChild>
@@ -86,29 +64,41 @@ export default function SponsorDashboard() {
           <div className="grid gap-6 md:grid-cols-3 mb-8">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total Campaigns</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Campaigns
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold">{mockCampaigns.length}</div>
-                <p className="text-xs text-muted-foreground">+2 from last month</p>
+                <p className="text-xs text-muted-foreground">
+                  +2 from last month
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total Quests</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Quests
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold">{mockQuests.length}</div>
-                <p className="text-xs text-muted-foreground">+1 from last month</p>
+                <p className="text-xs text-muted-foreground">
+                  +1 from last month
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total Participants</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Participants
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold">1,250</div>
-                <p className="text-xs text-muted-foreground">+350 from last month</p>
+                <p className="text-xs text-muted-foreground">
+                  +350 from last month
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -144,32 +134,55 @@ export default function SponsorDashboard() {
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-lg font-semibold">{campaign.title}</h3>
-                          <p className="text-sm text-muted-foreground mb-4">{campaign.description}</p>
+                          <h3 className="text-lg font-semibold">
+                            {campaign.title}
+                          </h3>
+                          <p className="text-sm text-muted-foreground mb-4">
+                            {campaign.description}
+                          </p>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div>
                               <p className="text-sm font-medium">Claim Rate</p>
-                              <p className="text-2xl font-bold">{campaign.claimRate}%</p>
+                              <p className="text-2xl font-bold">
+                                {campaign.claimRate}%
+                              </p>
                             </div>
                             <div>
-                              <p className="text-sm font-medium">Total Claims</p>
-                              <p className="text-2xl font-bold">{campaign.totalClaims}</p>
+                              <p className="text-sm font-medium">
+                                Total Claims
+                              </p>
+                              <p className="text-2xl font-bold">
+                                {campaign.totalClaims}
+                              </p>
                             </div>
                             <div>
                               <p className="text-sm font-medium">Visitors</p>
-                              <p className="text-2xl font-bold">{campaign.uniqueVisitors}</p>
+                              <p className="text-2xl font-bold">
+                                {campaign.uniqueVisitors}
+                              </p>
                             </div>
                             <div>
                               <p className="text-sm font-medium">Conversion</p>
-                              <p className="text-2xl font-bold">{campaign.conversionRate}%</p>
+                              <p className="text-2xl font-bold">
+                                {campaign.conversionRate}%
+                              </p>
                             </div>
                           </div>
                         </div>
                         <div className="flex flex-row md:flex-col gap-2 mt-4 md:mt-0">
-                          <Button variant="outline" size="sm" className="flex-1" asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            asChild
+                          >
                             <Link href={`/claim/${campaign.id}`}>View</Link>
                           </Button>
-                          <Button variant="outline" size="sm" className="flex-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                          >
                             <BarChart3 className="mr-2 h-4 w-4" />
                             Analytics
                           </Button>
@@ -207,33 +220,58 @@ export default function SponsorDashboard() {
                                 className="rounded-full object-cover"
                               />
                             </div>
-                            <h3 className="text-lg font-semibold">{quest.title}</h3>
+                            <h3 className="text-lg font-semibold">
+                              {quest.title}
+                            </h3>
                           </div>
-                          <p className="text-sm text-muted-foreground mb-4">{quest.description}</p>
+                          <p className="text-sm text-muted-foreground mb-4">
+                            {quest.description}
+                          </p>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div>
-                              <p className="text-sm font-medium">Participants</p>
-                              <p className="text-2xl font-bold">{quest.participants}</p>
+                              <p className="text-sm font-medium">
+                                Participants
+                              </p>
+                              <p className="text-2xl font-bold">
+                                {quest.participants}
+                              </p>
                             </div>
                             <div>
-                              <p className="text-sm font-medium">Completion Rate</p>
-                              <p className="text-2xl font-bold">{quest.completionRate}%</p>
+                              <p className="text-sm font-medium">
+                                Completion Rate
+                              </p>
+                              <p className="text-2xl font-bold">
+                                {quest.completionRate}%
+                              </p>
                             </div>
                             <div>
                               <p className="text-sm font-medium">XP Reward</p>
-                              <p className="text-2xl font-bold">{quest.xpReward}</p>
+                              <p className="text-2xl font-bold">
+                                {quest.xpReward}
+                              </p>
                             </div>
                             <div>
                               <p className="text-sm font-medium">Avg. Time</p>
-                              <p className="text-2xl font-bold">{quest.averageTimeToComplete}</p>
+                              <p className="text-2xl font-bold">
+                                {quest.averageTimeToComplete}
+                              </p>
                             </div>
                           </div>
                         </div>
                         <div className="flex flex-row md:flex-col gap-2 mt-4 md:mt-0">
-                          <Button variant="outline" size="sm" className="flex-1" asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            asChild
+                          >
                             <Link href={`/quests/${quest.id}`}>View</Link>
                           </Button>
-                          <Button variant="outline" size="sm" className="flex-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                          >
                             <BarChart3 className="mr-2 h-4 w-4" />
                             Analytics
                           </Button>
@@ -248,5 +286,5 @@ export default function SponsorDashboard() {
         </div>
       </main>
     </div>
-  )
+  );
 }
