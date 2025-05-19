@@ -8,11 +8,12 @@ import { BarChart3, Plus, Rocket, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useWallet } from "@/lib/wallet-provider"
+import { useAccount } from "@starknet-react/core"
+
 import { mockCampaigns, mockQuests } from "@/lib/mock-data"
 
 export default function SponsorDashboard() {
-  const { address } = useWallet()
+  const { address } = useAccount()
   const [activeTab, setActiveTab] = useState("campaigns")
 
   // Mock campaign analytics

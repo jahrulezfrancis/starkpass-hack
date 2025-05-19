@@ -1,12 +1,11 @@
-"use client"
+'use client'
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Bell, Lock, Rocket, Shield, User, Wallet } from "lucide-react"
-
+import { useAccount, useNetwork, useDisconnect } from "@starknet-react/core"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -16,14 +15,15 @@ import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/components/ui/use-toast"
-import { useWallet } from "@/lib/wallet-provider"
 import { truncateAddress } from "@/lib/utils"
 import AuthRedirectDialog from "@/components/auth-redirect-dialogue"
 
 export default function SettingsClient() {
   const router = useRouter()
   const { toast } = useToast()
-  const { address, isConnected, networkName, disconnect } = useWallet()
+  const { account, address, status } = useAccount()
+  const { chain } = useNetwork()
+  const { disconnect } = useDisconnect()
   const [mounted, setMounted] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
@@ -55,16 +55,15 @@ export default function SettingsClient() {
 
   // Wallet settings
   const [walletSettings, setWalletSettings] = useState({
-    defaultNetwork: networkName || "Goerli Testnet",
+    defaultNetwork: chain?.name || "Goerli Testnet",
     autoConnect: true,
   })
 
-  // Set mounted state to true after component mounts
+  // Set mounted state and load mock settings
   useEffect(() => {
     setMounted(true)
 
-    // Load mock settings
-    if (isConnected) {
+    if (status === "connected" && address) {
       setProfileSettings({
         displayName: "Starknet User",
         bio: "Exploring the Starknet ecosystem",
@@ -73,8 +72,12 @@ export default function SettingsClient() {
         discord: "starknetuser#1234",
         website: "https://example.com",
       })
+      setWalletSettings((prev) => ({
+        ...prev,
+        defaultNetwork: chain?.name || "Goerli Testnet",
+      }))
     }
-  }, [isConnected])
+  }, [status, address, chain?.name])
 
   // Handle profile settings change
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -101,10 +104,7 @@ export default function SettingsClient() {
   const handleSaveSettings = async (settingsType: string) => {
     try {
       setIsSaving(true)
-
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000))
-
       toast({
         title: "Settings Saved",
         description: `Your ${settingsType} settings have been saved successfully.`,
@@ -125,6 +125,7 @@ export default function SettingsClient() {
   const handleDisconnect = async () => {
     try {
       await disconnect()
+      localStorage.removeItem('starknetConnectorId') // Clear connector persistence
       toast({
         title: "Wallet Disconnected",
         description: "Your wallet has been disconnected successfully.",
@@ -144,7 +145,7 @@ export default function SettingsClient() {
     return null
   }
 
-  if (!isConnected) {
+  if (status !== "connected" || !address) {
     return <AuthRedirectDialog message="You need to connect your wallet to access your settings." />
   }
 
@@ -173,7 +174,7 @@ export default function SettingsClient() {
           <div className="flex items-center gap-4">
             <Link href={`/profile/${address}`} className="flex items-center gap-2">
               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
-                {address ? address.charAt(2).toUpperCase() : "?"}
+                {address.charAt(2).toUpperCase()}
               </div>
             </Link>
           </div>
@@ -435,7 +436,7 @@ export default function SettingsClient() {
                     <div className="flex items-center justify-between p-3 bg-muted rounded-md">
                       <div className="flex items-center gap-2">
                         <Wallet className="h-5 w-5 text-primary" />
-                        <span className="font-medium">{truncateAddress(address || "")}</span>
+                        <span className="font-medium">{truncateAddress(address)}</span>
                       </div>
                       <Button variant="outline" size="sm" onClick={handleDisconnect}>
                         Disconnect
@@ -457,7 +458,7 @@ export default function SettingsClient() {
                         <SelectItem value="Sepolia Testnet">Sepolia Testnet</SelectItem>
                       </SelectContent>
                     </Select>
-                    <p className="text-sm text-muted-foreground">Current network: {networkName}</p>
+                    <p className="text-sm text-muted-foreground">Current network: {chain?.name || "Unknown"}</p>
                   </div>
                   <Separator />
                   <div className="flex items-center justify-between">

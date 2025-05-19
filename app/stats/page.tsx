@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useWallet } from "@/lib/wallet-provider"
+import { useAccount } from "@starknet-react/core"
 import { useContract } from "@/lib/contract-provider"
 import { truncateAddress } from "@/lib/utils"
 import { mockEcosystemStats } from "@/lib/mock-data"
@@ -25,7 +25,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function StatsPage() {
-  const { address } = useWallet()
+  const { address } = useAccount()
   const { exportData, isLoading } = useContract()
   const [showExportDialog, setShowExportDialog] = useState(false)
   const [exportType, setExportType] = useState("all")

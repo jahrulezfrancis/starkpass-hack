@@ -18,15 +18,15 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useWallet } from "@/lib/wallet-provider";
-import { useUser } from "@/lib/user-provider";
 import { calculateLevelProgress, truncateAddress } from "@/lib/utils";
 import { mockQuests } from "@/lib/mock-data";
 import AuthRedirectDialog from "@/components/auth-redirect-dialogue";
+import { useAccount } from "@starknet-react/core";
+import { useUser } from "@/lib/user-provider";
 
 export default function DashboardClient() {
   const router = useRouter();
-  const { address, isConnected } = useWallet();
+  const { address, isConnected } = useAccount();
   const { badges, credentials, completedQuests, claimableItems, xp, level, isLoading } = useUser();
   const [mounted, setMounted] = useState(false);
 
