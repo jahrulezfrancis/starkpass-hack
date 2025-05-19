@@ -13,7 +13,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { useWallet } from "@/lib/wallet-provider"
+import { useAccount } from "@starknet-react/core"
+import { connect } from "starknetkit"
+
 
 interface AuthRedirectDialogProps {
   redirectPath?: string
@@ -25,7 +27,7 @@ export default function AuthRedirectDialog({
   message = "You need to connect your wallet to access this page.",
 }: AuthRedirectDialogProps) {
   const router = useRouter()
-  const { connect, isConnected } = useWallet()
+  const { isConnected } = useAccount()
   const [showDialog, setShowDialog] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
   const [mounted, setMounted] = useState(false)

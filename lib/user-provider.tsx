@@ -1,10 +1,11 @@
-"use client"
+'use client'
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import { useWallet } from "./wallet-provider"
 import { useContract } from "./contract-provider"
 import type { Badge, Credential } from "@/types"
 import { mockCompletedQuests } from "@/lib/mock-data"
+import { useAccount } from "@starknet-react/core"
+import { useToast } from "@/components/ui/use-toast"
 
 interface UserContextType {
   badges: Badge[]
@@ -14,6 +15,7 @@ interface UserContextType {
   xp: number
   level: number
   isLoading: boolean
+  error: string | null
   completeQuest: (questId: string) => Promise<void>
   claimCredential: (credentialId: string) => Promise<void>
 }
@@ -21,7 +23,8 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const { address, isConnected } = useWallet()
+  const { toast } = useToast()
+  const { address, status } = useAccount()
   const { getUserBadges, getUserCredentials, mintBadge, mintCredential } = useContract()
   const [badges, setBadges] = useState<Badge[]>([])
   const [credentials, setCredentials] = useState<Credential[]>([])
@@ -29,12 +32,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [claimableItems, setClaimableItems] = useState<Credential[]>([])
   const [xp, setXp] = useState(0)
   const [level, setLevel] = useState(1)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Load user data when wallet is connected
   useEffect(() => {
     const loadUserData = async () => {
-      if (!isConnected || !address) {
+      if (status !== "connected" || !address) {
         // Reset state when disconnected
         setBadges([])
         setCredentials([])
@@ -42,94 +46,100 @@ export function UserProvider({ children }: { children: ReactNode }) {
         setClaimableItems([])
         setXp(0)
         setLevel(1)
+        setError(null)
         setIsLoading(false)
         return
       }
 
-      if (isConnected && address) {
-        setIsLoading(true)
+      setIsLoading(true)
+      setError(null)
 
-        try {
-          // Fetch badges from contract
-          const userBadges = await getUserBadges(address)
-          setBadges(userBadges)
+      try {
+        // Fetch badges from contract
+        const userBadges = await getUserBadges(address)
+        setBadges(userBadges)
 
-          // Fetch credentials from contract
-          const userCredentials = await getUserCredentials(address)
-          setCredentials(userCredentials)
+        // Fetch credentials from contract
+        const userCredentials = await getUserCredentials(address)
+        setCredentials(userCredentials)
 
-          // For now, we'll still use mock data for completed quests
-          // In a real implementation, this would be fetched from a database or contract
-          setCompletedQuests(mockCompletedQuests)
+        // Set completed quests (mock for now)
+        setCompletedQuests(mockCompletedQuests)
 
-          // Generate some claimable items
-          // In a real implementation, this would be fetched from a database or contract
-          const claimable = [
-            {
-              id: "claimable-cred-1",
-              name: "Starknet Hackathon 2025",
-              description: "Participated in the Starknet Hackathon 2025",
-              image: "/placeholder.svg?height=300&width=300",
-              issuer: "Starknet Foundation",
-              issuedAt: new Date().toISOString(),
-              tokenId: "1234",
-              contractAddress: "0x1234567890abcdef",
-            },
-            {
-              id: "claimable-cred-2",
-              name: "Cairo Workshop",
-              description: "Completed the Cairo Smart Contract Workshop",
-              image: "/placeholder.svg?height=300&width=300",
-              issuer: "StarkWare",
-              issuedAt: new Date().toISOString(),
-              tokenId: "5678",
-              contractAddress: "0x1234567890abcdef",
-            },
-          ]
-          setClaimableItems(claimable)
+        // Set claimable items (mock for now)
+        const claimable: Credential[] = [
+          {
+            id: "claimable-cred-1",
+            name: "Starknet Hackathon 2025",
+            description: "Participated in the Starknet Hackathon 2025",
+            image: "/placeholder.svg?height=300&width=300",
+            issuer: "Starknet Foundation",
+            issuedAt: new Date().toISOString(),
+            tokenId: "1234",
+            contractAddress: process.env.NEXT_PUBLIC_CREDENTIAL_CONTRACT_ADDRESS || "0x1234567890abcdef",
+          },
+          {
+            id: "claimable-cred-2",
+            name: "Cairo Workshop",
+            description: "Completed the Cairo Smart Contract Workshop",
+            image: "/placeholder.svg?height=300&width=300",
+            issuer: "StarkWare",
+            issuedAt: new Date().toISOString(),
+            tokenId: "5678",
+            contractAddress: process.env.NEXT_PUBLIC_CREDENTIAL_CONTRACT_ADDRESS || "0x1234567890abcdef",
+          },
+        ]
+        setClaimableItems(claimable)
 
-          // Calculate XP and level
-          const totalXp = completedQuests.length * 100
-          setXp(totalXp)
-          setLevel(Math.floor(totalXp / 500) + 1)
-        } catch (error) {
-          console.error("Failed to load user data:", error)
-        } finally {
-          setIsLoading(false)
-        }
-      } else {
-        // Reset state when disconnected
-        setBadges([])
-        setCredentials([])
-        setCompletedQuests([])
-        setClaimableItems([])
-        setXp(0)
-        setLevel(1)
+        // Calculate XP and level after setting completedQuests
+        const totalXp = mockCompletedQuests.length * 100
+        setXp(totalXp)
+        setLevel(Math.floor(totalXp / 500) + 1)
+      } catch (err) {
+        console.error("Failed to load user data:", err)
+        const errorMessage = "Failed to load user data. Please try again."
+        setError(errorMessage)
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        })
+      } finally {
         setIsLoading(false)
       }
     }
 
     loadUserData()
-  }, [isConnected, address, getUserBadges, getUserCredentials])
+  }, [status, address, getUserBadges, getUserCredentials, toast])
 
   // Complete a quest
   const completeQuest = async (questId: string) => {
-    if (!isConnected || !address) throw new Error("Wallet not connected")
+    if (status !== "connected" || !address) {
+      const errorMessage = "Wallet not connected"
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      })
+      throw new Error(errorMessage)
+    }
+
+    setIsLoading(true)
+    setError(null)
 
     try {
-      // In a real implementation, this would interact with a smart contract
-      // For now, we'll update the state and mint a badge
+      // Update state
       setCompletedQuests((prev) => [...prev, questId])
-      setXp((prev) => prev + 100)
+      const newXp = xp + 100
+      setXp(newXp)
 
       // Check if level up
-      const newXp = xp + 100
       const newLevel = Math.floor(newXp / 500) + 1
       if (newLevel > level) {
         setLevel(newLevel)
       }
 
-      // Mint a badge for completing the quest
+      // Mint a badge
       const badgeUri = `https://starkpass.example/badge/${questId}`
       await mintBadge(address, questId, badgeUri)
 
@@ -137,26 +147,55 @@ export function UserProvider({ children }: { children: ReactNode }) {
       const userBadges = await getUserBadges(address)
       setBadges(userBadges)
 
-      return Promise.resolve()
-    } catch (error) {
-      console.error("Failed to complete quest:", error)
-      throw error
+      toast({
+        title: "Quest Completed",
+        description: `Quest ${questId} completed successfully!`,
+      })
+    } catch (err) {
+      console.error("Failed to complete quest:", err)
+      const errorMessage = "Failed to complete quest. Please try again."
+      setError(errorMessage)
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      })
+      throw err
+    } finally {
+      setIsLoading(false)
     }
   }
 
   // Claim a credential
   const claimCredential = async (credentialId: string) => {
-    if (!isConnected || !address) throw new Error("Wallet not connected")
+    if (status !== "connected" || !address) {
+      const errorMessage = "Wallet not connected"
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      })
+      throw new Error(errorMessage)
+    }
+
+    setIsLoading(true)
+    setError(null)
 
     try {
-      // Find the credential in claimable items
+      // Find the credential
       const credential = claimableItems.find((item) => item.id === credentialId)
-      if (!credential) throw new Error("Credential not found")
+      if (!credential) {
+        const errorMessage = "Credential not found"
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        })
+        throw new Error(errorMessage)
+      }
 
       // Mint the credential
       const credentialUri = `https://starkpass.example/credential/${credentialId}`
-
-      // For development, simulate a delay
       if (process.env.NODE_ENV === "development") {
         await new Promise((resolve) => setTimeout(resolve, 1500))
       } else {
@@ -167,10 +206,22 @@ export function UserProvider({ children }: { children: ReactNode }) {
       setCredentials((prev) => [...prev, credential])
       setClaimableItems((prev) => prev.filter((item) => item.id !== credentialId))
 
-      return Promise.resolve()
-    } catch (error) {
-      console.error("Failed to claim credential:", error)
-      throw error
+      toast({
+        title: "Credential Claimed",
+        description: `Credential ${credential.name} claimed successfully!`,
+      })
+    } catch (err) {
+      console.error("Failed to claim credential:", err)
+      const errorMessage = "Failed to claim credential. Please try again."
+      setError(errorMessage)
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      })
+      throw err
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -184,6 +235,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         xp,
         level,
         isLoading,
+        error,
         completeQuest,
         claimCredential,
       }}

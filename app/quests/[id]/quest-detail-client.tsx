@@ -10,14 +10,14 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
-import { useWallet } from "@/lib/wallet-provider"
 import { useUser } from "@/lib/user-provider"
 import { mockQuests } from "@/lib/mock-data"
+import { useAccount } from "@starknet-react/core"
 
 export default function QuestDetailClient({ questId }: { questId: string }) {
   const router = useRouter()
   const { toast } = useToast()
-  const { address, isConnected } = useWallet()
+  const { address, isConnected } = useAccount()
   const { completedQuests, completeQuest } = useUser()
   const [completingSteps, setCompletingSteps] = useState<boolean[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)

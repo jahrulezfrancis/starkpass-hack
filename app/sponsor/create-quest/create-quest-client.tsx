@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/components/ui/use-toast"
-import { useWallet } from "@/lib/wallet-provider"
+import { useAccount } from "@starknet-react/core"
 import { useContract } from "@/lib/contract-provider"
 import {
   AlertDialog,
@@ -30,7 +30,7 @@ import {
 export default function CreateQuestClient() {
   const router = useRouter()
   const { toast } = useToast()
-  const { address, isConnected } = useWallet()
+  const { address, isConnected } = useAccount()
   const { createQuest } = useContract()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)

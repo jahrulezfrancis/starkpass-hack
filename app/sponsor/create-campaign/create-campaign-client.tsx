@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { DatePicker } from "@/components/ui/date-picker"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/components/ui/use-toast"
-import { useWallet } from "@/lib/wallet-provider"
+import { useAccount } from "@starknet-react/core"
 import { useContract } from "@/lib/contract-provider"
 import {
   AlertDialog,
@@ -31,7 +31,7 @@ import {
 export default function CreateCampaignClient() {
   const router = useRouter()
   const { toast } = useToast()
-  const { address, isConnected } = useWallet()
+  const { address, isConnected } = useAccount()
   const { createCampaign } = useContract()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
