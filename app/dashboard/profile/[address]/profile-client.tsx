@@ -55,48 +55,47 @@ export default function ProfileClient({
   };
 
   // Handle share profile
-  // Update your handleShareProfile function with proper error handling
-  const handleShareProfile = async () => {
-    const shareText = `Check out my StarkPass profile with ${badges.length} badges and ${completedCampaigns.length + completedQuests.length} credentials!`;
+const handleShareProfile = async () => {
+  const shareText = `Check out my StarkPass profile with ${badges.length} badges and ${completedCampaigns.length + completedQuests.length} credentials!`
 
-    try {
-      // Try to use Web Share API if available
-      if (navigator.share) {
-        await navigator.share({
-          title: "My StarkPass Profile",
-          text: shareText,
-          url: profileUrl,
-        });
-        // Share was successful
-        toast({
-          title: "Shared Successfully",
-          description: "Your profile has been shared.",
-        });
-      } else {
-        // Fallback to clipboard
-        await navigator.clipboard.writeText(`${shareText} ${profileUrl}`);
+  try {
+    if (navigator.share) {
+      await navigator.share({
+        title: "My StarkPass Profile",
+        text: shareText,
+        url: profileUrl,
+      })
+      toast({
+        title: "Shared Successfully",
+        description: "Your profile has been shared.",
+      })
+    } else {
+      try {
+        await navigator.clipboard.writeText(`${shareText} ${profileUrl}`)
         toast({
           title: "Share Info Copied",
           description: "Share text and link have been copied to clipboard.",
-        });
-      }
-    } catch (error) {
-      // Only show error toast if it's NOT an abort error (user canceled)
-      if (
-        typeof error === "object" &&
-        error !== null &&
-        "name" in error &&
-        (error as { name: string }).name !== "AbortError"
-      ) {
+        })
+      } catch (clipboardError) {
         toast({
-          title: "Share Failed",
-          description: "Could not share the profile. Please try again.",
+          title: "Share Unavailable",
+          description: "Please copy the URL manually: " + profileUrl,
           variant: "destructive",
-        });
+        })
       }
-      console.error("Share error:", error);
     }
-  };
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      // User canceled - do nothing
+      return
+    }
+    toast({
+      title: "Share Failed",
+      description: "Could not share the profile. Please try again.",
+      variant: "destructive",
+    })
+  }
+}
 
   // View on explorer
   const viewOnExplorer = () => {
