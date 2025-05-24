@@ -11,7 +11,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import Image from "next/image";
+import logo from "../public/mainLogo.png";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+
 export function MobileNav() {
   const [open, setOpen] = useState(false);
 
@@ -36,7 +39,7 @@ export function MobileNav() {
             className="flex items-center gap-2 text-lg font-semibold"
             onClick={() => setOpen(false)}
           >
-            <Rocket className="h-6 w-6 text-primary" />
+            <Image width={50} height={50} alt={"logo"} src={logo} />
             <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent font-bold ">
               StarkPass
             </span>
