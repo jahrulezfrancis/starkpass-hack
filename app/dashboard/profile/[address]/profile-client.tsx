@@ -14,9 +14,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useUser } from "@/lib/user-provider";
 import { calculateLevelProgress, formatDate, truncateAddress, } from "@/lib/utils";
 import { useAccount } from "@starknet-react/core";
-import { getUserCompletedQuests } from "@/hooks/quest/useFetchQuest";
-import { Quest } from "@/types";
-import { useUserProgress } from "@/hooks/useUserProgress";
+import { getMockBadges, mockCampaigns, mockCompletedQuests, mockCredentials, mockQuests } from "@/lib/mock-data";
 
 export default function ProfileClient({
   userAddress,
@@ -26,9 +24,9 @@ export default function ProfileClient({
   const { toast } = useToast();
   const { address: connectedAddress } = useAccount();
   const { xp, level, } = useUser();
+  const badges = getMockBadges();
   const [isOwner, setIsOwner] = useState(false);
   const [profileUrl, setProfileUrl] = useState("");
-  const {completedCampaigns, completedQuests, badges} = useUserProgress(connectedAddress)
 
   // Set profile URL for sharing
   useEffect(() => {
@@ -55,47 +53,47 @@ export default function ProfileClient({
   };
 
   // Handle share profile
-const handleShareProfile = async () => {
-  const shareText = `Check out my StarkPass profile with ${badges.length} badges and ${completedCampaigns.length + completedQuests.length} credentials!`
+  const handleShareProfile = async () => {
+    const shareText = `Check out my StarkPass profile with ${getMockBadges.length} badges and ${mockCredentials.length} credentials!`
 
-  try {
-    if (navigator.share) {
-      await navigator.share({
-        title: "My StarkPass Profile",
-        text: shareText,
-        url: profileUrl,
-      })
-      toast({
-        title: "Shared Successfully",
-        description: "Your profile has been shared.",
-      })
-    } else {
-      try {
-        await navigator.clipboard.writeText(`${shareText} ${profileUrl}`)
-        toast({
-          title: "Share Info Copied",
-          description: "Share text and link have been copied to clipboard.",
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: "My StarkPass Profile",
+          text: shareText,
+          url: profileUrl,
         })
-      } catch (clipboardError) {
         toast({
-          title: "Share Unavailable",
-          description: "Please copy the URL manually: " + profileUrl,
-          variant: "destructive",
+          title: "Shared Successfully",
+          description: "Your profile has been shared.",
         })
+      } else {
+        try {
+          await navigator.clipboard.writeText(`${shareText} ${profileUrl}`)
+          toast({
+            title: "Share Info Copied",
+            description: "Share text and link have been copied to clipboard.",
+          })
+        } catch (clipboardError) {
+          toast({
+            title: "Share Unavailable",
+            description: "Please copy the URL manually: " + profileUrl,
+            variant: "destructive",
+          })
+        }
       }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        // User canceled - do nothing
+        return
+      }
+      toast({
+        title: "Share Failed",
+        description: "Could not share the profile. Please try again.",
+        variant: "destructive",
+      })
     }
-  } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') {
-      // User canceled - do nothing
-      return
-    }
-    toast({
-      title: "Share Failed",
-      description: "Could not share the profile. Please try again.",
-      variant: "destructive",
-    })
   }
-}
 
   // View on explorer
   const viewOnExplorer = () => {
@@ -117,7 +115,7 @@ const handleShareProfile = async () => {
         </title>
         <meta
           name="description"
-          content={`StarkPass profile with ${badges.length} badges and ${completedCampaigns.length} credentials`}
+          content={`StarkPass profile with ${getMockBadges.length} badges and ${mockCredentials.length} credentials`}
         />
         <meta
           property="og:title"
@@ -125,7 +123,7 @@ const handleShareProfile = async () => {
         />
         <meta
           property="og:description"
-          content={`Check out this StarkPass profile with ${badges.length} badges and ${completedCampaigns.length} credentials!`}
+          content={`Check out this StarkPass profile with ${getMockBadges.length} badges and ${mockCredentials.length} credentials!`}
         />
         <meta
           property="og:image"
@@ -190,14 +188,14 @@ const handleShareProfile = async () => {
                       <Separator />
                       <div className="grid grid-cols-3 gap-2 text-center">
                         <div>
-                          <p className="text-2xl font-bold">{badges.length}</p>
+                          <p className="text-2xl font-bold">{getMockBadges.length}</p>
                           <p className="text-xs text-muted-foreground">
                             Badges
                           </p>
                         </div>
                         <div>
                           <p className="text-2xl font-bold">
-                            {completedQuests.length + badges.length}
+                            {mockQuests.length + getMockBadges.length}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             Credentials
@@ -205,7 +203,7 @@ const handleShareProfile = async () => {
                         </div>
                         <div>
                           <p className="text-2xl font-bold">
-                            {completedQuests.length}
+                            {mockQuests.length}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             Quests
@@ -263,9 +261,9 @@ const handleShareProfile = async () => {
                   {/* Credentials Tab */}
                   <TabsContent value="credentials" className="mt-6">
                     <h2 className="text-xl font-semibold mb-4">Credentials</h2>
-                    {completedCampaigns.length > 0 ? (
+                    {mockCampaigns.length > 0 ? (
                       <div className="grid gap-4 md:grid-cols-2">
-                        {completedCampaigns.map((credential) => (
+                        {mockCampaigns.map((credential) => (
                           <Card key={credential.id}>
                             <CardContent className="p-4">
                               <div className="flex gap-4">
@@ -336,7 +334,7 @@ const handleShareProfile = async () => {
                   {/* Badges Tab */}
                   <TabsContent value="badges" className="mt-6">
                     <h2 className="text-xl font-semibold mb-4">Badges</h2>
-                    {badges.length > 0 ? (
+                    {getMockBadges.length > 0 ? (
                       <div className="grid gap-4 md:grid-cols-3">
                         {badges.map((badge) => (
                           <Card key={badge.id}>
@@ -393,9 +391,9 @@ const handleShareProfile = async () => {
                     <h2 className="text-xl font-semibold mb-4">
                       Completed Quests
                     </h2>
-                    {completedQuests.length > 0 ? (
+                    {mockQuests.length > 0 ? (
                       <div className="space-y-4">
-                        {completedQuests.map((quest) => (
+                        {mockQuests.map((quest) => (
                           <Card key={quest.id}>
                             <CardContent className="p-4">
                               <div className="flex items-center gap-4">

@@ -26,7 +26,7 @@ import { useUser } from "@/lib/user-provider";
 
 export default function DashboardClient() {
   const router = useRouter();
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, isConnecting, status } = useAccount();
   const {
     badges,
     credentials,
@@ -34,7 +34,6 @@ export default function DashboardClient() {
     claimableItems,
     xp,
     level,
-    isLoading,
   } = useUser();
   const [mounted, setMounted] = useState(false);
 
@@ -44,20 +43,20 @@ export default function DashboardClient() {
   }, []);
 
   useEffect(() => {
-    if (mounted && !isConnected && !isLoading) {
+    if (mounted && !isConnected) {
       // Handled by AuthRedirectDialog
     }
-  }, [isConnected, router, mounted, isLoading]);
+  }, [isConnected, router, mounted]);
 
   if (!mounted) {
     return null;
   }
 
-  if (!isConnected || isLoading) {
+  if (!isConnected) {
     return <DashboardSkeleton />;
   }
 
-  if (mounted && !isConnected && !isLoading) {
+  if (mounted && !isConnected && status === "disconnected") {
     return (
       <AuthRedirectDialog message="You need to connect your wallet to access your dashboard." />
     );
@@ -271,8 +270,8 @@ export default function DashboardClient() {
                               quest.difficulty === "Easy"
                                 ? "text-green-500"
                                 : quest.difficulty === "Medium"
-                                ? "text-yellow-500"
-                                : "text-red-500"
+                                  ? "text-yellow-500"
+                                  : "text-red-500"
                             }
                           >
                             {quest.difficulty}

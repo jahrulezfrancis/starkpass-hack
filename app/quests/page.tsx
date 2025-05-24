@@ -11,16 +11,15 @@ import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
 import { useUser } from "@/lib/user-provider";
 import type { Quest } from "@/types";
-import { UseAllQuests } from "@/hooks/quest/useFetchQuest";
+import { mockQuests } from "@/lib/mock-data";
 
 export default function QuestsPage() {
   const { completedQuests } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
-  const { quests } = UseAllQuests()
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
 
   // Filter quests based on search and difficulty
-  const filteredQuests = quests.filter((quest) => {
+  const filteredQuests = mockQuests.filter((quest) => {
     const matchesSearch =
       quest.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       quest.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
