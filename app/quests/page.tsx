@@ -3,33 +3,17 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { BadgeCheck, Filter, Rocket, Search, Trophy } from "lucide-react";
-
+import { BadgeCheck, Filter, Search, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
 import { useUser } from "@/lib/user-provider";
-import { mockQuests } from "@/lib/mock-data";
 import type { Quest } from "@/types";
-import { useAccount } from "@starknet-react/core";
+import { mockQuests } from "@/lib/mock-data";
 
 export default function QuestsPage() {
-  const { address } = useAccount();
   const { completedQuests } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
@@ -182,8 +166,8 @@ function QuestCard({
                 quest.difficulty === "Easy"
                   ? "text-green-500"
                   : quest.difficulty === "Medium"
-                  ? "text-yellow-500"
-                  : "text-red-500"
+                    ? "text-yellow-500"
+                    : "text-red-500"
               }
             >
               {quest.difficulty}
