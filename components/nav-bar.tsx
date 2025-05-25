@@ -3,7 +3,6 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Rocket } from "lucide-react";
 
 import { MobileNav } from "./mobile-nav";
 import { ThemeToggle } from "./theme-toggle";
@@ -11,6 +10,8 @@ import { cn } from "@/lib/utils";
 
 import { StarknetWalletConnect } from "./StartknetWalletConnect";
 import { useStarkPass } from "@/context/WalletContext";
+import Image from "next/image";
+import logo from "../public/mainLogo.png";
 
 export const Nav = () => {
   const pathname = usePathname();
@@ -40,8 +41,8 @@ export const Nav = () => {
             href="/"
             className="flex items-center gap-2 text-lg font-semibold ml-2 md:ml-0"
           >
-            <Rocket className="h-6 w-6 text-primary" />
-            <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent font-bold">
+            <Image width={50} height={50} alt={"logo"} src={logo} />
+            <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent font-bold hidden md:block">
               StarkPass
             </span>
           </Link>
