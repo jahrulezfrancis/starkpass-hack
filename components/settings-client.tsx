@@ -151,35 +151,6 @@ export default function SettingsClient() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="border-b">
-        <div className="container flex items-center justify-between h-16 px-4 md:px-6">
-          <Link href="/" className="flex items-center gap-2 text-lg font-semibold">
-            <Rocket className="h-6 w-6" />
-            <span>StarkPass</span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/dashboard" className="text-sm font-medium">
-              Dashboard
-            </Link>
-            <Link href="/sponsor" className="text-sm font-medium">
-              Sponsor
-            </Link>
-            <Link href="/stats" className="text-sm font-medium">
-              Stats
-            </Link>
-            <Link href="/settings" className="text-sm font-medium text-primary">
-              Settings
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link href={`/profile/${address}`} className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
-                {address.charAt(2).toUpperCase()}
-              </div>
-            </Link>
-          </div>
-        </div>
-      </header>
       <main className="flex-1 py-6 md:py-10">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
