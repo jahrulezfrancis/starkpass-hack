@@ -1,73 +1,93 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import Image from "next/image"
-import { ArrowLeft, BadgeCheck, Calendar, Check, Rocket, Share2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
-import { useToast } from "@/components/ui/use-toast"
-import { useUser } from "@/lib/user-provider"
-import { useContract } from "@/lib/contract-provider"
-import { formatDate } from "@/lib/utils"
-import { mockCampaigns } from "@/lib/mock-data"
-import { StarknetWalletConnect } from "@/components/StartknetWalletConnect"
-import { useAccount } from "@starknet-react/core"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import {
+  ArrowLeft,
+  BadgeCheck,
+  Calendar,
+  Check,
+  Rocket,
+  Share2,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/components/ui/use-toast";
+import { useUser } from "@/lib/user-provider";
+import { useContract } from "@/lib/contract-provider";
+import { formatDate } from "@/lib/utils";
+import { mockCampaigns } from "@/lib/mock-data";
+import { StarknetWalletConnect } from "@/components/StartknetWalletConnect";
+import { useAccount } from "@starknet-react/core";
 
-export default function ClaimDetailClient({ campaignId }: { campaignId: string }) {
-  const router = useRouter()
-  const { toast } = useToast()
-  const { address, isConnected } = useAccount()
-  const { claimCredential } = useUser()
-  const { isEligibleForClaim } = useContract()
-  const [isClaiming, setIsClaiming] = useState(false)
-  const [claimed, setClaimed] = useState(false)
-  const [isEligible, setIsEligible] = useState(false)
-  const [eligibilityChecked, setEligibilityChecked] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+export default function ClaimDetailClient({
+  campaignId,
+}: {
+  campaignId: string;
+}) {
+  const router = useRouter();
+  const { toast } = useToast();
+  const { address, isConnected } = useAccount();
+  const { claimCredential } = useUser();
+  const { isEligibleForClaim } = useContract();
+  const [isClaiming, setIsClaiming] = useState(false);
+  const [claimed, setClaimed] = useState(false);
+  const [isEligible, setIsEligible] = useState(false);
+  const [eligibilityChecked, setEligibilityChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Find the campaign
-  const campaign = mockCampaigns.find((c) => c.id === campaignId)
+  const campaign = mockCampaigns.find((c) => c.id === campaignId);
 
   // Check eligibility when wallet is connected
   useEffect(() => {
     const checkEligibility = async () => {
       if (isConnected && address && campaign) {
         try {
-          setIsLoading(true)
-          const eligible = await isEligibleForClaim(address, campaign.id)
-          setIsEligible(eligible)
-          setEligibilityChecked(true)
-          setIsLoading(false)
+          setIsLoading(true);
+          const eligible = await isEligibleForClaim(address, campaign.id);
+          setIsEligible(eligible);
+          setEligibilityChecked(true);
+          setIsLoading(false);
         } catch (error) {
-          console.error("Failed to check eligibility:", error)
-          setIsLoading(false)
+          console.error("Failed to check eligibility:", error);
+          setIsLoading(false);
           toast({
             title: "Error",
             description: "Failed to check eligibility. Please try again.",
             variant: "destructive",
-          })
+          });
         }
       } else {
-        setIsEligible(false)
-        setEligibilityChecked(false)
+        setIsEligible(false);
+        setEligibilityChecked(false);
       }
-    }
+    };
 
     if (isConnected && address) {
-      checkEligibility()
+      checkEligibility();
     }
-  }, [isConnected, address, campaign, isEligibleForClaim, toast])
+  }, [isConnected, address, campaign, isEligibleForClaim, toast]);
 
   // Handle if campaign not found
   if (!campaign) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <h1 className="text-2xl font-bold mb-4">Campaign Not Found</h1>
-        <p className="text-muted-foreground mb-6">The claim campaign you're looking for doesn't exist.</p>
+        <p className="text-muted-foreground mb-6">
+          The claim campaign you're looking for doesn't exist.
+        </p>
         <Button asChild>
           <Link href="/claim">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -75,44 +95,45 @@ export default function ClaimDetailClient({ campaignId }: { campaignId: string }
           </Link>
         </Button>
       </div>
-    )
+    );
   }
 
   // Handle connect wallet
 
-
   // Handle claim
   const handleClaim = async () => {
-    if (!isConnected || !isEligible) return
+    if (!isConnected || !isEligible) return;
 
     try {
-      setIsClaiming(true)
+      setIsClaiming(true);
       // Mock credential ID based on campaign
-      const credentialId = `claimable-cred-${campaign.id}`
-      await claimCredential(credentialId)
-      setClaimed(true)
+      const credentialId = `claimable-cred-${campaign.id}`;
+      // console.log("Claiming credential:", credentialId);
+      await claimCredential(credentialId);
+      setClaimed(true);
       toast({
         title: "Credential Claimed",
-        description: "Your credential has been successfully claimed and added to your profile.",
-      })
+        description:
+          "Your credential has been successfully claimed and added to your profile.",
+      });
     } catch (error) {
-      console.error("Failed to claim credential:", error)
+      console.error("Failed to claim credential:", error);
       toast({
         title: "Claim Failed",
         description: "Failed to claim credential. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsClaiming(false)
+      setIsClaiming(false);
     }
-  }
+  };
 
   // Handle share
   const handleShare = () => {
-    if (!address) return
+    if (!address) return;
 
-    const shareUrl = `${window.location.origin}/profile/${address}`
-    const shareText = `I just claimed the "${campaign.title}" credential on StarkPass! Check out my profile:`
+    const shareUrl = `${window.location.origin}/profile/${address}`;
+    const shareText = `I just claimed the "${campaign.title}" credential on StarkPass! Check out my profile:`;
 
     // Try to use Web Share API if available
     if (navigator.share) {
@@ -122,16 +143,16 @@ export default function ClaimDetailClient({ campaignId }: { campaignId: string }
           text: shareText,
           url: shareUrl,
         })
-        .catch((error) => console.error("Error sharing:", error))
+        .catch((error) => console.error("Error sharing:", error));
     } else {
       // Fallback to clipboard
-      navigator.clipboard.writeText(`${shareText} ${shareUrl}`)
+      navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
       toast({
         title: "Link Copied",
         description: "Share link has been copied to clipboard.",
-      })
+      });
     }
-  }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -165,7 +186,9 @@ export default function ClaimDetailClient({ campaignId }: { campaignId: string }
                       className="rounded-full object-cover"
                     />
                   </div>
-                  <span className="text-sm text-muted-foreground">{campaign.sponsor}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {campaign.sponsor}
+                  </span>
                 </div>
                 <CardTitle>{campaign.title}</CardTitle>
                 <CardDescription>{campaign.description}</CardDescription>
@@ -186,7 +209,10 @@ export default function ClaimDetailClient({ campaignId }: { campaignId: string }
                         {campaign.totalClaims} / {campaign.maxClaims}
                       </span>
                     </div>
-                    <Progress value={(campaign.totalClaims / campaign.maxClaims) * 100} className="h-2" />
+                    <Progress
+                      value={(campaign.totalClaims / campaign.maxClaims) * 100}
+                      className="h-2"
+                    />
                   </div>
                 </div>
               </CardContent>
@@ -196,7 +222,9 @@ export default function ClaimDetailClient({ campaignId }: { campaignId: string }
             <Card>
               <CardHeader>
                 <CardTitle>Claim Your Credential</CardTitle>
-                <CardDescription>Follow these steps to claim your on-chain credential</CardDescription>
+                <CardDescription>
+                  Follow these steps to claim your on-chain credential
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {claimed ? (
@@ -204,15 +232,23 @@ export default function ClaimDetailClient({ campaignId }: { campaignId: string }
                     <div className="flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 mb-4">
                       <Check className="h-8 w-8 text-green-600 dark:text-green-300" />
                     </div>
-                    <h3 className="text-xl font-semibold mb-2">Successfully Claimed!</h3>
+                    <h3 className="text-xl font-semibold mb-2">
+                      Successfully Claimed!
+                    </h3>
                     <p className="text-muted-foreground text-center mb-6">
                       Your credential has been added to your profile.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 w-full">
                       <Button className="flex-1" asChild>
-                        <Link href={`/profile/${address}`}>View in Profile</Link>
+                        <Link href={`/dashboard/profile/${address}`}>
+                          View in Profile
+                        </Link>
                       </Button>
-                      <Button variant="outline" className="flex-1" onClick={handleShare}>
+                      <Button
+                        variant="outline"
+                        className="flex-1"
+                        onClick={handleShare}
+                      >
                         <Share2 className="mr-2 h-4 w-4" />
                         Share
                       </Button>
@@ -230,11 +266,11 @@ export default function ClaimDetailClient({ campaignId }: { campaignId: string }
                           <p className="text-sm text-muted-foreground">
                             Connect your Starknet wallet to verify eligibility
                           </p>
-                          {!isConnected && (
-                            <StarknetWalletConnect />
-                          )}
+                          {!isConnected && <StarknetWalletConnect />}
                         </div>
-                        {isConnected && <Check className="h-5 w-5 text-green-500 ml-auto" />}
+                        {isConnected && (
+                          <Check className="h-5 w-5 text-green-500 ml-auto" />
+                        )}
                       </div>
 
                       <Separator />
@@ -254,21 +290,34 @@ export default function ClaimDetailClient({ campaignId }: { campaignId: string }
                               <span>Checking eligibility...</span>
                             </div>
                           )}
-                          {isConnected && eligibilityChecked && isEligible && !isLoading && (
-                            <div className="flex items-center gap-2 mt-2 text-green-500 text-sm">
-                              <BadgeCheck className="h-4 w-4" />
-                              <span>You are eligible to claim this credential</span>
-                            </div>
-                          )}
-                          {isConnected && eligibilityChecked && !isEligible && !isLoading && (
-                            <div className="flex items-center gap-2 mt-2 text-red-500 text-sm">
-                              <span>You are not eligible for this credential</span>
-                            </div>
-                          )}
+                          {isConnected &&
+                            eligibilityChecked &&
+                            isEligible &&
+                            !isLoading && (
+                              <div className="flex items-center gap-2 mt-2 text-green-500 text-sm">
+                                <BadgeCheck className="h-4 w-4" />
+                                <span>
+                                  You are eligible to claim this credential
+                                </span>
+                              </div>
+                            )}
+                          {isConnected &&
+                            eligibilityChecked &&
+                            !isEligible &&
+                            !isLoading && (
+                              <div className="flex items-center gap-2 mt-2 text-red-500 text-sm">
+                                <span>
+                                  You are not eligible for this credential
+                                </span>
+                              </div>
+                            )}
                         </div>
-                        {isConnected && eligibilityChecked && isEligible && !isLoading && (
-                          <Check className="h-5 w-5 text-green-500 ml-auto" />
-                        )}
+                        {isConnected &&
+                          eligibilityChecked &&
+                          isEligible &&
+                          !isLoading && (
+                            <Check className="h-5 w-5 text-green-500 ml-auto" />
+                          )}
                       </div>
 
                       <Separator />
@@ -279,7 +328,9 @@ export default function ClaimDetailClient({ campaignId }: { campaignId: string }
                         </div>
                         <div>
                           <p className="font-medium">Claim Your Credential</p>
-                          <p className="text-sm text-muted-foreground">Mint your credential to your wallet</p>
+                          <p className="text-sm text-muted-foreground">
+                            Mint your credential to your wallet
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -290,10 +341,16 @@ export default function ClaimDetailClient({ campaignId }: { campaignId: string }
                 {!claimed && (
                   <Button
                     className="w-full"
-                    disabled={!isConnected || !isEligible || isClaiming || isLoading}
+                    disabled={
+                      !isConnected || !isEligible || isClaiming || isLoading
+                    }
                     onClick={handleClaim}
                   >
-                    {isClaiming ? "Claiming..." : isLoading ? "Checking Eligibility..." : "Claim Credential"}
+                    {isClaiming
+                      ? "Claiming..."
+                      : isLoading
+                      ? "Checking Eligibility..."
+                      : "Claim Credential"}
                   </Button>
                 )}
               </CardFooter>
@@ -302,5 +359,5 @@ export default function ClaimDetailClient({ campaignId }: { campaignId: string }
         </div>
       </main>
     </div>
-  )
+  );
 }
