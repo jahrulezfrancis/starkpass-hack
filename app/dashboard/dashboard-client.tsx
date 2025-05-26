@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Award, BadgeCheck, ChevronRight, Rocket, Trophy } from "lucide-react";
+import { Award, BadgeCheck, ChevronRight, Trophy } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -324,27 +324,7 @@ export default function DashboardClient() {
 function DashboardSkeleton() {
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="border-b">
-        <div className="container flex items-center justify-between h-16 px-4 md:px-6">
-          <div className="flex items-center gap-2 text-lg font-semibold">
-            <Rocket className="h-6 w-6" />
-            <span>StarkPass</span>
-          </div>
-          <div className="hidden md:flex items-center gap-6">
-            <span className="text-sm font-medium text-primary">Dashboard</span>
-            <span className="text-sm font-medium">Quests</span>
-            <span className="text-sm font-medium">Profile</span>
-            <span className="text-sm font-medium">Claim</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Skeleton className="h-8 w-8 rounded-full" />
-              <Skeleton className="hidden md:inline-block h-4 w-24" />
-            </div>
-          </div>
-        </div>
-      </header>
-      <main className="flex-1 py-6 md:py-10">
+    <main className="flex-1 py-6 md:py-10">
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Card className="col-span-full md:col-span-1">

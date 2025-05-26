@@ -4,14 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  ArrowLeft,
-  BadgeCheck,
-  Calendar,
-  Check,
-  Rocket,
-  Share2,
-} from "lucide-react";
+import { ArrowLeft, BadgeCheck, Calendar, Check, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,

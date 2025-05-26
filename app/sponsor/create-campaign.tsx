@@ -1,27 +1,40 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { ArrowLeft, ImagePlus, Rocket, Upload } from "lucide-react"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft, ImagePlus, Upload } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { DatePicker } from "@/components/ui/date-picker"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/components/ui/use-toast"
-import { useAccount } from "@starknet-react/core"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/ui/date-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
+import { useAccount } from "@starknet-react/core";
 
 export default function CreateCampaignPage() {
-  const router = useRouter()
-  const { toast } = useToast()
-  const { address, isConnected } = useAccount()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter();
+  const { toast } = useToast();
+  const { address, isConnected } = useAccount();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -30,102 +43,78 @@ export default function CreateCampaignPage() {
     maxClaims: 100,
     eligibilityType: "open",
     image: null as File | null,
-  })
+  });
 
   // Handle form input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   // Handle select changes
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   // Handle date changes
   const handleDateChange = (name: string, date: Date | undefined) => {
     if (date) {
-      setFormData((prev) => ({ ...prev, [name]: date }))
+      setFormData((prev) => ({ ...prev, [name]: date }));
     }
-  }
+  };
 
   // Handle file upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFormData((prev) => ({ ...prev, image: e.target.files![0] }))
+      setFormData((prev) => ({ ...prev, image: e.target.files![0] }));
     }
-  }
+  };
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!isConnected) {
       toast({
         title: "Wallet Not Connected",
         description: "Please connect your wallet to create a campaign.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     try {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
 
       // In a real implementation, this would upload the image to IPFS and create a campaign on the blockchain
       // For this MVP, we'll just show a success message and redirect
 
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       toast({
         title: "Campaign Created",
         description: "Your claim campaign has been created successfully.",
-      })
+      });
 
       // Redirect to sponsor dashboard
-      router.push("/sponsor")
+      router.push("/sponsor");
     } catch (error) {
-      console.error("Failed to create campaign:", error)
+      console.error("Failed to create campaign:", error);
       toast({
         title: "Creation Failed",
         description: "Failed to create campaign. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="border-b">
-        <div className="container flex items-center justify-between h-16 px-4 md:px-6">
-          <Link href="/" className="flex items-center gap-2 text-lg font-semibold">
-            <Rocket className="h-6 w-6" />
-            <span>StarkPass</span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/dashboard" className="text-sm font-medium">
-              Dashboard
-            </Link>
-            <Link href="/sponsor" className="text-sm font-medium text-primary">
-              Sponsor
-            </Link>
-            <Link href="/stats" className="text-sm font-medium">
-              Stats
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link href={`/profile/${address}`} className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
-                {address ? address.charAt(2).toUpperCase() : "?"}
-              </div>
-            </Link>
-          </div>
-        </div>
-      </header>
       <main className="flex-1 py-6 md:py-10">
         <div className="container px-4 md:px-6">
           <Button variant="ghost" size="sm" className="mb-6" asChild>
@@ -139,7 +128,9 @@ export default function CreateCampaignPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Create Claim Campaign</CardTitle>
-                <CardDescription>Create a new credential claim campaign for your community</CardDescription>
+                <CardDescription>
+                  Create a new credential claim campaign for your community
+                </CardDescription>
               </CardHeader>
               <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-6">
@@ -170,11 +161,17 @@ export default function CreateCampaignPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label>Start Date</Label>
-                      <DatePicker date={formData.startDate} onSelect={(date) => handleDateChange("startDate", date)} />
+                      <DatePicker
+                        date={formData.startDate}
+                        onSelect={(date) => handleDateChange("startDate", date)}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label>End Date</Label>
-                      <DatePicker date={formData.endDate} onSelect={(date) => handleDateChange("endDate", date)} />
+                      <DatePicker
+                        date={formData.endDate}
+                        onSelect={(date) => handleDateChange("endDate", date)}
+                      />
                     </div>
                   </div>
 
@@ -195,7 +192,9 @@ export default function CreateCampaignPage() {
                       <Label htmlFor="eligibilityType">Eligibility Type</Label>
                       <Select
                         value={formData.eligibilityType}
-                        onValueChange={(value) => handleSelectChange("eligibilityType", value)}
+                        onValueChange={(value) =>
+                          handleSelectChange("eligibilityType", value)
+                        }
                       >
                         <SelectTrigger id="eligibilityType">
                           <SelectValue placeholder="Select eligibility type" />
@@ -203,8 +202,12 @@ export default function CreateCampaignPage() {
                         <SelectContent>
                           <SelectItem value="open">Open to All</SelectItem>
                           <SelectItem value="allowlist">Allowlist</SelectItem>
-                          <SelectItem value="token-gated">Token Gated</SelectItem>
-                          <SelectItem value="quest-completion">Quest Completion</SelectItem>
+                          <SelectItem value="token-gated">
+                            Token Gated
+                          </SelectItem>
+                          <SelectItem value="quest-completion">
+                            Quest Completion
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -217,17 +220,24 @@ export default function CreateCampaignPage() {
                         <div className="flex flex-col items-center">
                           <div className="relative w-32 h-32 mb-4">
                             <img
-                              src={URL.createObjectURL(formData.image) || "/placeholder.svg"}
+                              src={
+                                URL.createObjectURL(formData.image) ||
+                                "/placeholder.svg"
+                              }
                               alt="Credential Preview"
                               className="w-full h-full object-cover rounded-lg"
                             />
                           </div>
-                          <p className="text-sm text-muted-foreground mb-2">{formData.image.name}</p>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {formData.image.name}
+                          </p>
                           <Button
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={() => setFormData((prev) => ({ ...prev, image: null }))}
+                            onClick={() =>
+                              setFormData((prev) => ({ ...prev, image: null }))
+                            }
                           >
                             Change Image
                           </Button>
@@ -235,7 +245,9 @@ export default function CreateCampaignPage() {
                       ) : (
                         <>
                           <ImagePlus className="h-10 w-10 text-muted-foreground mb-2" />
-                          <p className="text-sm text-muted-foreground mb-2">Drag and drop or click to upload</p>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            Drag and drop or click to upload
+                          </p>
                           <Input
                             id="image"
                             type="file"
@@ -247,7 +259,9 @@ export default function CreateCampaignPage() {
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={() => document.getElementById("image")?.click()}
+                            onClick={() =>
+                              document.getElementById("image")?.click()
+                            }
                           >
                             <Upload className="h-4 w-4 mr-2" />
                             Upload Image
@@ -258,7 +272,11 @@ export default function CreateCampaignPage() {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isSubmitting}
+                  >
                     {isSubmitting ? "Creating Campaign..." : "Create Campaign"}
                   </Button>
                 </CardFooter>
@@ -268,5 +286,5 @@ export default function CreateCampaignPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }
