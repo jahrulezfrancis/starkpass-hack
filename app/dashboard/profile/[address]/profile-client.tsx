@@ -3,18 +3,34 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { BadgeCheck, Copy, ExternalLink, Share2, Trophy, } from "lucide-react";
+import { BadgeCheck, Copy, ExternalLink, Share2, Trophy } from "lucide-react";
 import Head from "next/head";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { useUser } from "@/lib/user-provider";
-import { calculateLevelProgress, formatDate, truncateAddress, } from "@/lib/utils";
+import {
+  calculateLevelProgress,
+  formatDate,
+  truncateAddress,
+} from "@/lib/utils";
 import { useAccount } from "@starknet-react/core";
-import { getMockBadges, mockCampaigns, mockCompletedQuests, mockCredentials, mockQuests } from "@/lib/mock-data";
+import {
+  getMockBadges,
+  mockCampaigns,
+  mockCompletedQuests,
+  mockCredentials,
+  mockQuests,
+} from "@/lib/mock-data";
 
 export default function ProfileClient({
   userAddress,
@@ -23,7 +39,7 @@ export default function ProfileClient({
 }) {
   const { toast } = useToast();
   const { address: connectedAddress } = useAccount();
-  const { xp, level, } = useUser();
+  const { xp, level } = useUser();
   const badges = getMockBadges();
   const [isOwner, setIsOwner] = useState(false);
   const [profileUrl, setProfileUrl] = useState("");
@@ -42,7 +58,6 @@ export default function ProfileClient({
     }
   }, [connectedAddress, userAddress]);
 
-
   // Handle copy profile link
   const handleCopyProfileLink = () => {
     navigator.clipboard.writeText(profileUrl);
@@ -54,7 +69,7 @@ export default function ProfileClient({
 
   // Handle share profile
   const handleShareProfile = async () => {
-    const shareText = `Check out my StarkPass profile with ${getMockBadges.length} badges and ${mockCredentials.length} credentials!`
+    const shareText = `Check out my StarkPass profile with ${getMockBadges.length} badges and ${mockCredentials.length} credentials!`;
 
     try {
       if (navigator.share) {
@@ -62,38 +77,38 @@ export default function ProfileClient({
           title: "My StarkPass Profile",
           text: shareText,
           url: profileUrl,
-        })
+        });
         toast({
           title: "Shared Successfully",
           description: "Your profile has been shared.",
-        })
+        });
       } else {
         try {
-          await navigator.clipboard.writeText(`${shareText} ${profileUrl}`)
+          await navigator.clipboard.writeText(`${shareText} ${profileUrl}`);
           toast({
             title: "Share Info Copied",
             description: "Share text and link have been copied to clipboard.",
-          })
+          });
         } catch (clipboardError) {
           toast({
             title: "Share Unavailable",
             description: "Please copy the URL manually: " + profileUrl,
             variant: "destructive",
-          })
+          });
         }
       }
     } catch (error) {
-      if (error instanceof DOMException && error.name === 'AbortError') {
+      if (error instanceof DOMException && error.name === "AbortError") {
         // User canceled - do nothing
-        return
+        return;
       }
       toast({
         title: "Share Failed",
         description: "Could not share the profile. Please try again.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   // View on explorer
   const viewOnExplorer = () => {
@@ -188,7 +203,9 @@ export default function ProfileClient({
                       <Separator />
                       <div className="grid grid-cols-3 gap-2 text-center">
                         <div>
-                          <p className="text-2xl font-bold">{getMockBadges.length}</p>
+                          <p className="text-2xl font-bold">
+                            {getMockBadges.length}
+                          </p>
                           <p className="text-xs text-muted-foreground">
                             Badges
                           </p>
@@ -269,7 +286,10 @@ export default function ProfileClient({
                               <div className="flex gap-4">
                                 <div className="relative w-16 h-16 flex-shrink-0">
                                   <Image
-                                    src={credential.credentialImage || "/placeholder.svg"}
+                                    src={
+                                      credential.credentialImage ||
+                                      "/placeholder.svg"
+                                    }
                                     alt={credential.title}
                                     fill
                                     className="rounded-md object-cover"
@@ -415,7 +435,7 @@ export default function ProfileClient({
                                   </div>
                                 </div>
                                 <Button variant="outline" size="sm" asChild>
-                                  <Link href={`/quests/${quest}`}>View</Link>
+                                  <Link href={`/quests`}>View</Link>
                                 </Button>
                               </div>
                             </CardContent>

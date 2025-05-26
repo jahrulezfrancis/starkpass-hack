@@ -184,7 +184,7 @@ export function StarknetWalletConnect() {
             Dashboard
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => router.push(`/profile/${account.address}`)}
+            onClick={() => router.push(`/dashboard/profile/${account.address}`)}
           >
             Profile
           </DropdownMenuItem>

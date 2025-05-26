@@ -1,22 +1,35 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { ArrowLeft, ImagePlus, Rocket, Upload } from "lucide-react"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft, ImagePlus, Rocket, Upload } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { DatePicker } from "@/components/ui/date-picker"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/components/ui/use-toast"
-import { useAccount } from "@starknet-react/core"
-import { useContract } from "@/lib/contract-provider"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/ui/date-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
+import { useAccount } from "@starknet-react/core";
+import { useContract } from "@/lib/contract-provider";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,16 +39,16 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 
 export default function CreateCampaignClient() {
-  const router = useRouter()
-  const { toast } = useToast()
-  const { address, isConnected } = useAccount()
-  const { createCampaign } = useContract()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const router = useRouter();
+  const { toast } = useToast();
+  const { address, isConnected } = useAccount();
+  const { createCampaign } = useContract();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -44,49 +57,52 @@ export default function CreateCampaignClient() {
     maxClaims: 100,
     eligibilityType: "open",
     image: null as File | null,
-  })
+  });
 
   // Set mounted state to true after component mounts
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   // Redirect to home if not connected
   useEffect(() => {
     if (mounted && !isConnected) {
       toast({
         title: "Authentication Required",
-        description: "Please connect your wallet to access the sponsor dashboard.",
+        description:
+          "Please connect your wallet to access the sponsor dashboard.",
         variant: "destructive",
-      })
-      router.push("/")
+      });
+      router.push("/");
     }
-  }, [isConnected, router, mounted, toast])
+  }, [isConnected, router, mounted, toast]);
 
   // Handle form input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   // Handle select changes
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   // Handle date changes
   const handleDateChange = (name: string, date: Date | undefined) => {
     if (date) {
-      setFormData((prev) => ({ ...prev, [name]: date }))
+      setFormData((prev) => ({ ...prev, [name]: date }));
     }
-  }
+  };
 
   // Handle file upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFormData((prev) => ({ ...prev, image: e.target.files![0] }))
+      setFormData((prev) => ({ ...prev, image: e.target.files![0] }));
     }
-  }
+  };
 
   // Validate form
   const validateForm = () => {
@@ -95,8 +111,8 @@ export default function CreateCampaignClient() {
         title: "Missing Title",
         description: "Please enter a campaign title.",
         variant: "destructive",
-      })
-      return false
+      });
+      return false;
     }
 
     if (!formData.description.trim()) {
@@ -104,8 +120,8 @@ export default function CreateCampaignClient() {
         title: "Missing Description",
         description: "Please enter a campaign description.",
         variant: "destructive",
-      })
-      return false
+      });
+      return false;
     }
 
     if (formData.endDate <= formData.startDate) {
@@ -113,8 +129,8 @@ export default function CreateCampaignClient() {
         title: "Invalid Date Range",
         description: "End date must be after start date.",
         variant: "destructive",
-      })
-      return false
+      });
+      return false;
     }
 
     if (!formData.image) {
@@ -122,21 +138,21 @@ export default function CreateCampaignClient() {
         title: "Missing Image",
         description: "Please upload a credential image.",
         variant: "destructive",
-      })
-      return false
+      });
+      return false;
     }
 
-    return true
-  }
+    return true;
+  };
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!validateForm()) return
+    if (!validateForm()) return;
 
-    setShowConfirmDialog(true)
-  }
+    setShowConfirmDialog(true);
+  };
 
   // Handle campaign creation
   const handleCreateCampaign = async () => {
@@ -145,12 +161,12 @@ export default function CreateCampaignClient() {
         title: "Wallet Not Connected",
         description: "Please connect your wallet to create a campaign.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     try {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
 
       // Create campaign metadata
       const campaignMetadata = {
@@ -161,32 +177,32 @@ export default function CreateCampaignClient() {
         maxClaims: Number(formData.maxClaims),
         eligibilityType: formData.eligibilityType,
         imageUrl: formData.image ? URL.createObjectURL(formData.image) : "",
-      }
+      };
 
       // In a real implementation, this would upload the image to IPFS and create a campaign on the blockchain
-      await createCampaign(campaignMetadata)
+      await createCampaign(campaignMetadata);
 
       toast({
         title: "Campaign Created",
         description: "Your claim campaign has been created successfully.",
-      })
+      });
 
       // Redirect to sponsor dashboard
-      router.push("/sponsor")
+      router.push("/sponsor");
     } catch (error) {
-      console.error("Failed to create campaign:", error)
+      console.error("Failed to create campaign:", error);
       toast({
         title: "Creation Failed",
         description: "Failed to create campaign. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   if (!mounted || !isConnected) {
-    return null
+    return null;
   }
 
   return (
@@ -204,7 +220,9 @@ export default function CreateCampaignClient() {
             <Card>
               <CardHeader>
                 <CardTitle>Create Claim Campaign</CardTitle>
-                <CardDescription>Create a new credential claim campaign for your community</CardDescription>
+                <CardDescription>
+                  Create a new credential claim campaign for your community
+                </CardDescription>
               </CardHeader>
               <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-6">
@@ -235,11 +253,17 @@ export default function CreateCampaignClient() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label>Start Date</Label>
-                      <DatePicker date={formData.startDate} onSelect={(date) => handleDateChange("startDate", date)} />
+                      <DatePicker
+                        date={formData.startDate}
+                        onSelect={(date) => handleDateChange("startDate", date)}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label>End Date</Label>
-                      <DatePicker date={formData.endDate} onSelect={(date) => handleDateChange("endDate", date)} />
+                      <DatePicker
+                        date={formData.endDate}
+                        onSelect={(date) => handleDateChange("endDate", date)}
+                      />
                     </div>
                   </div>
 
@@ -260,7 +284,9 @@ export default function CreateCampaignClient() {
                       <Label htmlFor="eligibilityType">Eligibility Type</Label>
                       <Select
                         value={formData.eligibilityType}
-                        onValueChange={(value) => handleSelectChange("eligibilityType", value)}
+                        onValueChange={(value) =>
+                          handleSelectChange("eligibilityType", value)
+                        }
                       >
                         <SelectTrigger id="eligibilityType">
                           <SelectValue placeholder="Select eligibility type" />
@@ -268,8 +294,12 @@ export default function CreateCampaignClient() {
                         <SelectContent>
                           <SelectItem value="open">Open to All</SelectItem>
                           <SelectItem value="allowlist">Allowlist</SelectItem>
-                          <SelectItem value="token-gated">Token Gated</SelectItem>
-                          <SelectItem value="quest-completion">Quest Completion</SelectItem>
+                          <SelectItem value="token-gated">
+                            Token Gated
+                          </SelectItem>
+                          <SelectItem value="quest-completion">
+                            Quest Completion
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -282,17 +312,24 @@ export default function CreateCampaignClient() {
                         <div className="flex flex-col items-center">
                           <div className="relative w-32 h-32 mb-4">
                             <img
-                              src={URL.createObjectURL(formData.image) || "/placeholder.svg"}
+                              src={
+                                URL.createObjectURL(formData.image) ||
+                                "/placeholder.svg"
+                              }
                               alt="Credential Preview"
                               className="w-full h-full object-cover rounded-lg"
                             />
                           </div>
-                          <p className="text-sm text-muted-foreground mb-2">{formData.image.name}</p>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {formData.image.name}
+                          </p>
                           <Button
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={() => setFormData((prev) => ({ ...prev, image: null }))}
+                            onClick={() =>
+                              setFormData((prev) => ({ ...prev, image: null }))
+                            }
                           >
                             Change Image
                           </Button>
@@ -300,7 +337,9 @@ export default function CreateCampaignClient() {
                       ) : (
                         <>
                           <ImagePlus className="h-10 w-10 text-muted-foreground mb-2" />
-                          <p className="text-sm text-muted-foreground mb-2">Drag and drop or click to upload</p>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            Drag and drop or click to upload
+                          </p>
                           <Input
                             id="image"
                             type="file"
@@ -312,7 +351,9 @@ export default function CreateCampaignClient() {
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={() => document.getElementById("image")?.click()}
+                            onClick={() =>
+                              document.getElementById("image")?.click()
+                            }
                           >
                             <Upload className="h-4 w-4 mr-2" />
                             Upload Image
@@ -323,7 +364,11 @@ export default function CreateCampaignClient() {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isSubmitting}
+                  >
                     {isSubmitting ? "Creating Campaign..." : "Create Campaign"}
                   </Button>
                 </CardFooter>
@@ -339,18 +384,21 @@ export default function CreateCampaignClient() {
           <AlertDialogHeader>
             <AlertDialogTitle>Create Campaign</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to create this campaign? This will deploy a smart contract to the Starknet
-              blockchain.
+              Are you sure you want to create this campaign? This will deploy a
+              smart contract to the Starknet blockchain.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleCreateCampaign} disabled={isSubmitting}>
+            <AlertDialogAction
+              onClick={handleCreateCampaign}
+              disabled={isSubmitting}
+            >
               {isSubmitting ? "Creating..." : "Create Campaign"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  )
+  );
 }
