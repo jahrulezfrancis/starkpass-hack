@@ -27,14 +27,8 @@ import { useUser } from "@/lib/user-provider";
 export default function DashboardClient() {
   const router = useRouter();
   const { address, isConnected, isConnecting, status } = useAccount();
-  const {
-    badges,
-    credentials,
-    completedQuests,
-    claimableItems,
-    xp,
-    level,
-  } = useUser();
+  const { badges, credentials, completedQuests, claimableItems, xp, level } =
+    useUser();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -203,7 +197,14 @@ export default function DashboardClient() {
                           </p>
                         </div>
                         <Button size="sm" asChild>
-                          <Link href={`/claim/${item.id}`}>Claim</Link>
+                          <Link
+                            href={`/claim/${item.id.replace(
+                              "claimable-cred-",
+                              ""
+                            )}`}
+                          >
+                            Claim
+                          </Link>
                         </Button>
                       </div>
                     ))}
@@ -270,8 +271,8 @@ export default function DashboardClient() {
                               quest.difficulty === "Easy"
                                 ? "text-green-500"
                                 : quest.difficulty === "Medium"
-                                  ? "text-yellow-500"
-                                  : "text-red-500"
+                                ? "text-yellow-500"
+                                : "text-red-500"
                             }
                           >
                             {quest.difficulty}
