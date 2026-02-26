@@ -176,6 +176,7 @@ export const mockCampaigns: Campaign[] = [
     credentialImage: "https://i.ibb.co/03BDpw5/starknet-hackathon.png?height=300&width=300",
     totalClaims: 250,
     maxClaims: 500,
+    credentialId: "cred-1",
   },
   {
     id: "campaign-2",
@@ -188,6 +189,7 @@ export const mockCampaigns: Campaign[] = [
     credentialImage: "https://i.ibb.co/nswTFcGH/Cairo-workshop.png?height=300&width=300",
     totalClaims: 120,
     maxClaims: 200,
+    credentialId: "cred-2",
   },
   {
     id: "campaign-3",
@@ -200,6 +202,7 @@ export const mockCampaigns: Campaign[] = [
     credentialImage: "https://i.ibb.co/jvG6M86y/starknet-community.png?height=300&width=300",
     totalClaims: 75,
     maxClaims: 100,
+    credentialId: "cred-3",
   },
 ]
 

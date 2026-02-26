@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Calendar, Rocket, Search, User } from "lucide-react";
+import { Calendar, Search, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
